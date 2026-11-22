@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated"
+  moduleFormat = "cjs"
+}
+datasource db {
+  provider = "mysql"
+}
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+enum Status {
+  DRAFT
+  PAYMENT_PENDING
+  ACTIVE
+  LOCKED
+  ARCHIVED
+}
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  REFUNDED
+  CANCELLED
+}
+enum Source {
+  CUSTOMER
+  ADMIN
+}
+enum Method {
+  ONLINE
+  LINK
+  OFFLINE
+}
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  name String
+  password String?
+  verifiedAt DateTime?
+  googleId String? @unique
+  role Role @default(CUSTOMER)
+  sessions Session[]
+  tokens AccountToken[]
+  invitations Invitation[]
+  logs ActivityLog[]
+  createdAt DateTime @default(now())
+  @@map("users")
+}
+model Session {
+  hash String @id
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires DateTime
+  @@index([userId])
+  @@map("sessions")
+}
+model AccountToken {
+  hash String @id
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind String
+  expires DateTime
+  @@index([userId, kind])
+  @@map("account_tokens")
+}
+model Category {
+  slug String @id
+  name String
+  templates Template[]
+  @@map("categories")
+}
+model Template {
+  slug String @id
+  name String
+  description String @db.Text
+  image String
+  style String
+  badge String?
+  classification String
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [slug])
+  regularPrice Int
+  offerPrice Int
+  active Boolean @default(true)
+  featured Boolean @default(false)
+  versions TemplateVersion[]
+  @@map("templates")
+}
+model TemplateVersion {
+  id String @id @default(uuid())
+  templateId String
+  template Template @relation(fields: [templateId], references: [slug])
+  number Int
+  config Json
+  invitations Invitation[]
+  @@unique([templateId, number])
+  @@map("template_versions")
+}
+model MusicTrack {
+  id String @id @default(uuid())
+  name String
+  artist String
+  license String
+  file String
+  active Boolean @default(true)
+  invitations Invitation[]
+  @@map("music_library")
+}
+model Invitation {
+  id String @id @default(uuid())
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id])
+  templateVersionId String
+  templateVersion TemplateVersion @relation(fields: [templateVersionId], references: [id])
+  status Status @default(DRAFT)
+  source Source @default(CUSTOMER)
+  slug String? @unique
+  previewToken String @unique
+  title String
+  names String
+  language String @default("en")
+  timezone String @default("Asia/Kolkata")
+  story String @db.Text
+  family String @db.Text
+  rsvpEnabled Boolean @default(true)
+  musicId String?
+  music MusicTrack? @relation(fields: [musicId], references: [id])
+  finalEventAt DateTime
+  events Event[]
+  gallery MediaAsset[]
+  order Order?
+  responses Rsvp[]
+  views View[]
+  guests Guest[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([ownerId, createdAt])
+  @@index([status, finalEventAt])
+  @@map("invitations")
+}
+model Event {
+  id String @id @default(uuid())
+  invitationId String
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name String
+  startsAt DateTime
+  venue String
+  mapUrl String?
+  description String @db.Text
+  @@index([invitationId, startsAt])
+  @@map("invitation_events")
+}
+model MediaAsset {
+  id String @id @default(uuid())
+  invitationId String
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  file String @unique
+  width Int
+  height Int
+  createdAt DateTime @default(now())
+  @@map("media_assets")
+}
+model Order {
+  id String @id @default(uuid())
+  invitationId String @unique
+  invitation Invitation @relation(fields: [invitationId], references: [id])
+  source Source
+  method Method
+  status PaymentStatus @default(PENDING)
+  regularPrice Int
+  offerPrice Int
+  amount Int
+  currency String @default("INR")
+  gatewayOrderId String? @unique
+  paymentLinkId String? @unique
+  paymentLinkUrl String?
+  gatewayPaymentId String? @unique
+  offlineReference String?
+  offlineNotes String? @db.Text
+  paidAt DateTime?
+  createdAt DateTime @default(now())
+  @@map("orders")
+}
+model Guest {
+  id String @id @default(uuid())
+  invitationId String
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name String
+  email String
+  @@unique([invitationId, email])
+  @@map("guests")
+}
+model Rsvp {
+  id String @id @default(uuid())
+  invitationId String
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name String
+  email String
+  attending Boolean
+  party Int
+  message String @db.Text
+  createdAt DateTime @default(now())
+  @@unique([invitationId, email])
+  @@map("rsvp_responses")
+}
+model View {
+  id String @id @default(uuid())
+  invitationId String
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([invitationId, createdAt])
+  @@map("invitation_views")
+}
+model ActivityLog {
+  id String @id @default(uuid())
+  actorId String
+  actor User @relation(fields: [actorId], references: [id])
+  action String
+  targetId String
+  detail Json
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+  @@map("activity_logs")
+}

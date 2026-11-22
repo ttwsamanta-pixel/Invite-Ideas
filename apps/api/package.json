@@ -1,0 +1,43 @@
+{
+  "name": "api",
+  "private": true,
+  "scripts": {
+    "dev": "npm run build && npm start",
+    "start": "node --env-file-if-exists=../../.env dist/main.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "generate": "prisma generate",
+    "migrate": "node --env-file-if-exists=../../.env ../../node_modules/prisma/build/index.js migrate deploy",
+    "seed": "node --env-file-if-exists=../../.env --import tsx prisma/seed.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11",
+    "@nestjs/core": "^11",
+    "@nestjs/jwt": "^11",
+    "@nestjs/platform-express": "^11",
+    "@nestjs/throttler": "^6",
+    "@prisma/adapter-mariadb": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "argon2": "^0.44",
+    "cookie-parser": "^1",
+    "express": "^5",
+    "google-auth-library": "^10",
+    "helmet": "^8",
+    "nodemailer": "10.6.1",
+    "qrcode": "^1.5",
+    "reflect-metadata": "^0.2",
+    "rxjs": "^7",
+    "sharp": "0.35.5",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1",
+    "@types/express": "^5",
+    "@types/node": "^24",
+    "@types/nodemailer": "^7",
+    "@types/qrcode": "^1",
+    "prisma": "7.10.1",
+    "tsx": "^4"
+  }
+}

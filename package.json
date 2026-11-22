@@ -1,0 +1,26 @@
+{
+  "name": "inviteideas",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w api\" \"npm run dev -w web\"",
+    "build": "npm run generate -w api && npm run build -w api && npm run build -w web",
+    "typecheck": "npm run generate -w api && npm run typecheck -w api && npm run typecheck -w web",
+    "lint": "eslint apps --max-warnings 0",
+    "test": "npm run test -w api",
+    "db:deploy": "npm run migrate -w api",
+    "db:seed": "npm run seed -w api"
+  },
+  "devDependencies": {
+    "concurrently": "^9",
+    "effect": "3.22.5",
+    "eslint": "^9",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8"
+  },
+  "overrides": {
+    "effect": "3.22.5"
+  }
+}

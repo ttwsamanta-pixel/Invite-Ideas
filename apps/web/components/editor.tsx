@@ -1,0 +1,108 @@
+'use client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { api, HttpError } from '../lib/client'
+import type { Invitation, Template } from '../lib/data'
+
+const short = z.string().trim().min(1, 'Required').max(180)
+const schema = z.object({
+  title: short, names: short, language: z.enum(['en', 'bn', 'hi']), story: z.string().max(4000), family: z.string().max(4000),
+  rsvpEnabled: z.boolean(), musicId: z.string(),
+  events: z.array(z.object({ name: short, date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/), venue: short, mapUrl: z.union([z.url({ protocol: /^https$/ }), z.literal('')]), description: z.string().max(4000) })).min(1).max(20),
+})
+type Fields = z.infer<typeof schema>
+const emptyEvent = { name: '', date: '', venue: '', mapUrl: '', description: '' }
+type Track = { id: string; name: string; artist: string }
+function indiaLocal(iso: string) {
+  return new Date(Date.parse(iso) + 19_800_000).toISOString().slice(0, 16)
+}
+export function Editor({ templates, selected, id, owner }: { templates: Template[]; selected?: string; id?: string; owner?: string }) {
+  const router = useRouter()
+  const [trackList, setTrackList] = useState<Track[]>([])
+  const [existing, setExisting] = useState<Invitation>()
+  const [ready, setReady] = useState(false)
+  const [error, setError] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [template, setTemplate] = useState(selected || templates[0]?.slug || '')
+  const { register, reset, control, handleSubmit, formState } = useForm<Fields>({
+    resolver: zodResolver(schema),
+    defaultValues: { title: '', names: '', language: 'en', story: '', family: '', rsvpEnabled: true, musicId: '', events: [emptyEvent] },
+  })
+  const { fields, append, remove } = useFieldArray({ control, name: 'events' })
+  useEffect(() => {
+    let live = true
+    const access = id ? api<Invitation>('/invitations/' + id) : api('/auth/me')
+    access.then(result => {
+      if (!live) return
+      if (id) {
+        const invitation = result as Invitation
+        setExisting(invitation)
+        reset({ ...invitation, musicId: invitation.musicId || '', events: invitation.events.map(item => ({ ...item, mapUrl: item.mapUrl || '', date: indiaLocal(item.startsAt) })) })
+      }
+      setReady(true)
+    }).catch(failure => {
+      if (!live) return
+      if (failure instanceof HttpError && failure.status === 401) router.replace('/login?next=' + encodeURIComponent(location.pathname))
+      else setError(failure.message)
+    })
+    api<Track[]>('/music').then(tracks => { if (live) setTrackList(tracks) }).catch(() => undefined)
+    return () => { live = false }
+  }, [id, reset, router])
+  const locked = existing && !['DRAFT', 'ACTIVE'].includes(existing.status || '')
+  const save = handleSubmit(async data => {
+    setError('')
+    try {
+      const path = id ? '/invitations/' + id : owner ? '/admin/invitations' : '/invitations'
+      const saved = await api<Invitation>(path, id ? 'PATCH' : 'POST', {
+        ...data, template, ownerId: owner, timezone: 'Asia/Kolkata', musicId: data.musicId || null,
+        events: data.events.map(({ date, mapUrl, ...event }) => ({ ...event, mapUrl: mapUrl || undefined, startsAt: date + ':00+05:30' })),
+      })
+      router.push(owner ? '/admin' : '/preview/invitation/' + saved.previewToken)
+    } catch (failure) { setError((failure as Error).message) }
+  })
+  async function upload(file: File) {
+    if (!id) return
+    setUploading(true); setError('')
+    try {
+      if (file.size > 5_000_000 || !/\.(jpe?g|png|webp)$/i.test(file.name)) throw new Error('Choose a JPEG, PNG or WebP photo up to 5 MB.')
+      const data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const asset = await api<{ id: string }>('/invitations/' + id + '/gallery', 'POST', { type: file.type, data })
+      setExisting(previous => previous ? { ...previous, gallery: [...previous.gallery, asset] } : previous)
+    } catch (failure) { setError((failure as Error).message) } finally { setUploading(false) }
+  }
+  return <section className="wrap content"><h1>{id ? 'Edit your invitation' : 'Create your invitation'}</h1>
+    {error && <p className="error" role="alert">{error}</p>}
+    {!ready && !error && <p role="status">Loading invitation editor…</p>}
+    {locked && <p className="panel">This invitation is {existing.status === 'LOCKED' ? 'locked because the final event has started.' : 'awaiting payment or archived.'} <Link href="/dashboard">Back to dashboard</Link></p>}
+    {ready && !locked && <div className="split"><form className="stack" onSubmit={save}>
+      <section className="panel stack"><h2>Basic details</h2>
+        {!id && <label>Template<select value={template} onChange={e => setTemplate(e.target.value)}>{templates.map(item => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>}
+        <div className="field-grid"><label>Invitation title<input {...register('title')} required maxLength={180} /></label><label>Names<input {...register('names')} required maxLength={180} /></label></div>
+        <label>Invitation language<select {...register('language')}><option value="en">English</option><option value="bn">বাংলা</option><option value="hi">हिन्दी</option></select></label>
+      </section>
+      <section className="panel stack"><h2>Events</h2><p>Enter event times in India Standard Time (IST). Editing closes at the start of your final event.</p>
+        {fields.map((field, index) => <fieldset className="stack" key={field.id}><legend>Event {index + 1}</legend><div className="field-grid"><label>Event name<input {...register(`events.${index}.name`)} required /></label><label>Date and time<input type="datetime-local" {...register(`events.${index}.date`)} required /></label>
+        <label>Venue address<input {...register(`events.${index}.venue`)} required /></label><label>Map link<input type="url" placeholder="https://" {...register(`events.${index}.mapUrl`)} /></label></div>
+        <label>Description<textarea {...register(`events.${index}.description`)} maxLength={4000} /></label>
+        {fields.length > 1 && <button type="button" className="button outline small" onClick={() => remove(index)}>Remove event {index + 1}</button>}</fieldset>)}
+        {fields.length < 20 && <button type="button" className="button outline" onClick={() => append(emptyEvent)}>Add another event</button>}
+      </section>
+      <section className="panel stack"><h2>Personal touches</h2><label>Story<textarea {...register('story')} maxLength={4000} /></label><label>Family or additional message<textarea {...register('family')} maxLength={4000} /></label><label>Background music<select {...register('musicId')}><option value="">No music</option>{trackList.map(track => <option value={track.id} key={track.id}>{track.name} · {track.artist}</option>)}</select></label>
+      <label className="checkbox"><input type="checkbox" {...register('rsvpEnabled')} /> Enable guest RSVP</label></section>
+      {Object.keys(formState.errors).length > 0 && <p role="alert" className="error">Check the required fields, event dates and HTTPS map links.</p>}
+      <button className="button" disabled={formState.isSubmitting || uploading}>{formState.isSubmitting ? 'Saving…' : owner ? 'Save invitation' : 'Save & preview'}</button>
+    </form><aside className="panel stack"><h2>Photo gallery</h2>{id ? <>
+      <label>Add a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file); event.target.value = '' }} /></label>
+      <div className="gallery">{existing?.gallery.map(asset => <a key={asset.id} href={'/api/public/media/' + asset.id}><img src={'/api/public/media/' + asset.id} alt="Invitation gallery photo" /></a>)}</div>
+    </> : <p>Save your draft, then reopen the editor to add photos.</p>}</aside></div>}
+  </section>
+}

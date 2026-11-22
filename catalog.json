@@ -1,0 +1,118 @@
+{
+  "categories": [
+    [
+      "wedding",
+      "Wedding"
+    ],
+    [
+      "bengali-wedding",
+      "Bengali Wedding"
+    ],
+    [
+      "engagement",
+      "Engagement"
+    ],
+    [
+      "birthday",
+      "Birthday"
+    ],
+    [
+      "annaprashan",
+      "Annaprashan"
+    ],
+    [
+      "puja",
+      "Puja"
+    ],
+    [
+      "housewarming",
+      "Housewarming"
+    ],
+    [
+      "anniversary",
+      "Anniversary"
+    ],
+    [
+      "haldi",
+      "Haldi"
+    ],
+    [
+      "mehendi",
+      "Mehendi"
+    ],
+    [
+      "sangeet",
+      "Sangeet"
+    ],
+    [
+      "reception",
+      "Reception"
+    ],
+    [
+      "baby-shower",
+      "Baby Shower"
+    ],
+    [
+      "naming-ceremony",
+      "Naming Ceremony"
+    ],
+    [
+      "other",
+      "Other"
+    ]
+  ],
+  "templates": [
+    [
+      "bengali-traditions",
+      "Bengali Traditions",
+      "bengali-wedding",
+      "Traditional",
+      "Bestseller",
+      149900,
+      199900,
+      "ruby",
+      "bengali",
+      "Arindam & Moupia",
+      "A classic Bengali wedding design with red silk, gold alpona and traditional details."
+    ],
+    [
+      "floral-elegance",
+      "Floral Elegance",
+      "wedding",
+      "Floral",
+      "New",
+      99900,
+      129900,
+      "rose",
+      "floral",
+      "Rohan & Ishita",
+      "Soft roses and warm ivory stationery for a romantic celebration."
+    ],
+    [
+      "royal-palace",
+      "Royal Palace",
+      "wedding",
+      "Royal",
+      "Premium",
+      199900,
+      249900,
+      "night",
+      "palace",
+      "Arjun & Sneha",
+      "A lantern-lit palace with gold filigree for a grand wedding celebration."
+    ],
+    [
+      "annaprashan-delight",
+      "Annaprashan Delight",
+      "annaprashan",
+      "Traditional",
+      null,
+      79900,
+      99900,
+      "marigold",
+      "rice",
+      "Aarav",
+      "A golden rice ceremony invitation with Bengali motifs and marigold accents."
+    ]
+  ]
+}
