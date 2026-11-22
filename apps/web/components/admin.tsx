@@ -1,5 +1,8 @@
 'use client'
 import Link from 'next/link'
+import { AdminContent } from './admin-content'
+import { AdminCoupons } from './admin-coupons'
+import { AdminReports } from './admin-reports'
 import { useEffect, useState, type FormEvent } from 'react'
 import { api } from '../lib/client'
 import { money, type Template } from '../lib/data'
@@ -38,6 +41,7 @@ export function Admin() {
     {!data && !error && <p role="status">Loading admin panel…</p>}
     {data && <>
       <section className="panel stack"><h2>Overview</h2><p>{data.totals._count} paid orders · {money(data.totals._sum.amount || 0)} collected</p></section>
+      <AdminReports />
       <section className="panel stack"><h2>Customers</h2>
         <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/customers', 'POST', Object.fromEntries(fields)), 'Customer saved.') }}>
           <label>Full name<input required name="name" /></label><label>Email address<input required name="email" type="email" /></label><button className="button small" disabled={busy}>Save customer</button>
@@ -50,7 +54,7 @@ export function Admin() {
       <section className="panel stack"><h2>Invitations and payments</h2>
         {data.invitations.map(item => <div className="stack" key={item.id}><div className="inline"><strong>{item.title}</strong><span>{item.owner.name} · {item.status}</span>{item.slug && <Link href={'/invite/' + item.slug}>Public invitation</Link>}
           {['DRAFT', 'ACTIVE', 'PAYMENT_PENDING'].includes(item.status) && <Link className="button outline small" href={'/editor/new?edit=' + item.id}>Edit</Link>}
-          {item.source === 'ADMIN' && ['DRAFT', 'PAYMENT_PENDING'].includes(item.status) && <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/invitations/' + item.id + '/payment-link', 'POST'), 'Payment link is available under Orders.')}>Create payment link</button>}</div>
+{item.status === 'LOCKED' && <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/invitations/' + item.id + '/archive', 'POST'), 'Invitation archived.')}>Archive</button>}{item.source === 'ADMIN' && ['DRAFT', 'PAYMENT_PENDING'].includes(item.status) && <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/invitations/' + item.id + '/payment-link', 'POST'), 'Payment link is available under Orders.')}>Create payment link</button>}</div>
           {item.source === 'ADMIN' && item.status === 'DRAFT' && <details><summary>Record a verified offline payment</summary>
             <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/invitations/' + item.id + '/offline-payment', 'POST', Object.fromEntries(fields)), 'Offline payment recorded and invitation activated.') }}>
               <label>Method<select name="type">{['Cash', 'UPI', 'Bank transfer', 'Other'].map(type => <option key={type}>{type}</option>)}</select></label>
@@ -89,6 +93,8 @@ export function Admin() {
       <section className="panel stack"><h2>Music library</h2><form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/music', 'POST', Object.fromEntries(fields)), 'Licensed track added.') }}>
         <label>Track name<input name="name" required /></label><label>Artist<input name="artist" required /></label><label>License reference<input name="license" required /></label><label>HTTPS audio URL<input name="file" type="url" required /></label><button className="button small" disabled={busy}>Add track</button>
       </form></section>
+      <AdminCoupons />
+      <AdminContent />
       <section className="panel stack"><h2>Recent activity</h2>{data.logs.map(log => <p key={log.id}>{new Date(log.createdAt).toLocaleString('en-IN')} · {log.actor.name} · {log.action.replaceAll('_', ' ').toLowerCase()}</p>)}</section>
     </>}
   </section>

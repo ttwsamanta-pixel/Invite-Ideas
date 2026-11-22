@@ -70,12 +70,13 @@ export function PrivatePreview({ token }: { token: string }) {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [published, setPublished] = useState('')
+  const [coupon, setCoupon] = useState('')
   useEffect(() => { api<Invitation>('/preview/' + token).then(setInvitation).catch(failure => setError(failure.message)) }, [token])
   async function checkout() {
     if (!invitation || !window.Razorpay) { setError('Checkout could not load. Refresh and try again.'); return }
     setBusy(true); setError('')
     try {
-      const order = await api<{ key: string; gatewayOrderId: string; amount: number; currency: string }>('/invitations/' + invitation.id + '/checkout', 'POST')
+      const order = await api<{ key: string; gatewayOrderId: string; amount: number; currency: string }>('/invitations/' + invitation.id + '/checkout', 'POST', { code: coupon.trim() || undefined })
       const Razorpay = window.Razorpay
       new Razorpay({
         key: order.key, order_id: order.gatewayOrderId, amount: order.amount, currency: order.currency, name: 'InviteIdeas',
@@ -91,7 +92,8 @@ export function PrivatePreview({ token }: { token: string }) {
   return <><Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
     <div className="preview-banner"><strong>Private invitation preview</strong><Link className="button outline small" href="/dashboard">My Invitations</Link>
       {published && <Link className="button small" href={'/invite/' + published}>Open Your Invitation</Link>}
-      {!published && invitation && (!invitation.order || (invitation.order.status === 'PENDING' && invitation.order.method === 'ONLINE')) && <button className="button small" onClick={checkout} disabled={busy}>{busy ? 'Processing…' : 'Pay & publish' + (' · ' + money(invitation.order?.amount ?? invitation.checkoutPrice ?? 0))}</button>}
+      {!published && invitation && !invitation.order && <label>Coupon code<input value={coupon} onChange={e => setCoupon(e.target.value)} maxLength={32} placeholder="Optional" /></label>}
+      {!published && invitation && (!invitation.order || (invitation.order.status === 'PENDING' && invitation.order.method === 'ONLINE')) && <button className="button small" onClick={checkout} disabled={busy}>{busy ? 'Processing…' : 'Pay & publish' + (coupon.trim() && !invitation.order ? '' : ' · ' + money(invitation.order?.amount ?? invitation.checkoutPrice ?? 0))}</button>}
       {invitation?.order?.status === 'PENDING' && invitation.order.paymentLinkUrl && <a className="button small" href={invitation.order.paymentLinkUrl}>Pay with Razorpay</a>}
     </div>
     {error && <p className="wrap error" role="alert">{error}</p>}

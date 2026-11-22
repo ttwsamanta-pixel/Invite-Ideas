@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
 import { test } from 'node:test'
+import { couponDiscount } from '../src/coupons'
 import { assertEditable, finalEvent, invitationBody, publicSlug, verifyMac } from '../src/core'
 
 test('the final event is calculated by instant across timezone offsets', () => {
@@ -41,4 +42,10 @@ test('map links accept HTTPS and reject script URLs', () => {
   assert.equal(invitationBody.safeParse(input).success, false)
   input.events[0].mapUrl = 'https://maps.google.com/'
   assert.equal(invitationBody.safeParse(input).success, true)
+})
+
+test('coupon discounts respect maximum discounts and minimum payable amounts', () => {
+  assert.equal(couponDiscount(149900, { type: 'PERCENT', value: 10, maximumDiscount: null }), 14990)
+  assert.equal(couponDiscount(149900, { type: 'PERCENT', value: 10, maximumDiscount: 10000 }), 10000)
+  assert.equal(couponDiscount(79900, { type: 'FIXED', value: 100000, maximumDiscount: null }), 79800)
 })

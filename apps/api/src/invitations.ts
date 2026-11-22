@@ -56,7 +56,7 @@ export class Invitations {
     if (id && !(await this.db.musicTrack.findFirst({ where: { id, active: true } }))) throw new BadRequestException('This track is unavailable.')
   }
   async eventPage(slug: string) {
-    const invitation = await this.db.invitation.findFirst({ where: { slug, status: { in: ['ACTIVE', 'LOCKED'] } }, include })
+    const invitation = await this.db.invitation.findFirst({ where: { slug, status: { in: ['ACTIVE', 'LOCKED', 'ARCHIVED'] } }, include })
     if (!invitation) throw new NotFoundException()
     return invitation
   }
@@ -148,10 +148,20 @@ export class InvitationsController {
   }
 
   @UseGuards(AuthGuard)
+  @Post('invitations/:id/guests/import')
+  async importGuests(@Req() req: AuthRequest, @Param('id') id: string, @Body() raw: unknown) {
+    await this.invitations.own(id, req.account)
+    const guests = validate(z.array(z.object({ name: short, email })).min(1).max(250), raw)
+    const unique = [...new Map(guests.map(guest => [guest.email, guest])).values()]
+    const { count } = await this.db.guest.createMany({ skipDuplicates: true, data: unique.map(guest => ({ ...guest, invitationId: id })) })
+    return { added: count }
+  }
+
+  @UseGuards(AuthGuard)
   @Get('invitations/:id/qr')
   async qr(@Req() req: AuthRequest, @Param('id') id: string, @Res() res: Response) {
     const invitation = await this.invitations.own(id, req.account)
-    if (!invitation.slug || invitation.order?.status !== 'SUCCESS' || !['ACTIVE', 'LOCKED'].includes(invitation.status)) throw new NotFoundException()
+    if (!invitation.slug || invitation.order?.status !== 'SUCCESS' || !['ACTIVE', 'LOCKED', 'ARCHIVED'].includes(invitation.status)) throw new NotFoundException()
     const directory = join(storage(), 'qr')
     await mkdir(directory, { recursive: true })
     const filename = join(directory, invitation.id + '.png')
@@ -187,7 +197,7 @@ export class InvitationsController {
   async publicMedia(@Req() req: Request, @Param('id') id: string, @Res() res: Response) {
     const asset = await this.db.mediaAsset.findUnique({ where: { id }, include: { invitation: { select: { status: true, ownerId: true } } } })
     if (!asset) throw new NotFoundException()
-    if (!['ACTIVE', 'LOCKED'].includes(asset.invitation.status)) {
+    if (!['ACTIVE', 'LOCKED', 'ARCHIVED'].includes(asset.invitation.status)) {
       const session = req.cookies.refresh && await this.db.session.findUnique({ where: { hash: digest(req.cookies.refresh) }, include: { user: true } })
       if (!session || session.expires <= new Date() || (session.userId !== asset.invitation.ownerId && session.user.role !== 'ADMIN')) throw new NotFoundException()
     }

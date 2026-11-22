@@ -1,26 +1,33 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, CirclePlay, Grid2X2, Infinity as InfinityIcon, Pencil, QrCode, Send, ShieldCheck, Smartphone, Zap } from 'lucide-react'
+import { getSiteCopy } from '../../lib/content'
 import { Market, Occasions } from '../../components/market'
 import { categories, demoCatalog, serverApi, type Template } from '../../lib/data'
 
+export async function generateMetadata() {
+  const copy = await getSiteCopy()
+  return { title: { absolute: copy.seoTitle }, description: copy.seoDescription }
+}
+
 export default async function Home() {
-  const [templates, occasions] = await Promise.all([serverApi<Template[]>('/templates'), serverApi<typeof categories>('/categories')])
+  const [templates, occasions, copy] = await Promise.all([serverApi<Template[]>('/templates'), serverApi<typeof categories>('/categories'), getSiteCopy()])
   const lead = (item: Template) => item.categoryId === 'bengali-wedding' ? -1 : item.categoryId === 'annaprashan' ? 1 : 0
   const featured = templates ? templates.filter(item => item.featured).sort((a, b) => lead(a) - lead(b)) : demoCatalog
   return <>
     <section className="hero">
       <div className="hero-art"><Image src="/images/hero.webp" alt="Bengali wedding invitation on a phone, framed by brass, flowers and red silk" fill priority sizes="(max-width: 767px) 100vw, 65vw" /></div>
       <div className="wrap hero-inner"><div className="hero-copy">
-        <p className="eyebrow">DIGITAL INVITATIONS FOR EVERY CELEBRATION</p>
-        <h1>Bengali Wedding <em>Invitation Templates</em></h1>
-        <p>Create a beautiful digital wedding invitation with traditional Bengali designs, rich visuals and modern features.</p>
+        <p className="eyebrow">{copy.heroEyebrow}</p>
+        <h1>{copy.heroTitle} <em>{copy.heroSubtitle}</em></h1>
+        <p>{copy.heroDescription}</p>
         <div className="hero-buttons"><Link className="button" href="/templates/bengali-wedding">Explore Bengali Wedding <ArrowRight size={18} /></Link><Link className="button outline" href="#how-it-works"><CirclePlay size={18} /> How It Works</Link></div>
         <div className="hero-features"><span><Smartphone /> Mobile friendly</span><span><Pencil /> Customizable</span><span><QrCode /> Link & QR code</span></div>
       </div></div>
     </section>
     <Occasions />
     <Market templates={featured} allCategories={occasions || categories} home />
+    {copy.testimonials.length > 0 && <section className="wrap content stack"><h2>Customer stories</h2>{copy.testimonials.map((item, index) => <blockquote className="panel" key={index}><p>{item.quote}</p><cite>{item.name}</cite></blockquote>)}</section>}
     <section className="steps" id="how-it-works"><div className="wrap steps-inner">
       <div><h2>How It Works</h2><p>Create your invitation in three steps.</p></div>
       {[[Grid2X2, 'Choose a template', 'Explore designs for your occasion.'], [Pencil, 'Customize your invitation', 'Add your names, photos, venues and events.'], [Send, 'Pay & share', 'Get your invitation link and QR code after payment.']].map(([Icon, title, description], index) => {

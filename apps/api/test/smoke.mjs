@@ -58,6 +58,53 @@ assert.equal(active.order.status, 'SUCCESS')
 assert.equal(active._count.views, 1)
 assert.equal(active._count.responses, 1)
 assert((await request('/admin')).logs.some(entry => entry.action === 'OFFLINE_PAYMENT_VERIFIED' && entry.targetId === active.order.id))
+const imported = await request('/invitations/' + assisted.id + '/guests/import', 'POST', [
+  { name: 'Guest', email: 'guest@example.test' }, { name: 'Guest', email: 'guest@example.test' },
+], 201)
+assert.equal(imported.added, 1)
+assert((await request('/admin/reports')).some(row => row.source === 'ADMIN' && row.method === 'OFFLINE' && row._count >= 1))
+await request('/admin/invitations/' + assisted.id + '/archive', 'POST', undefined, 400)
+const article = { slug: 'smoke-' + suffix, category: 'Wedding', title: 'Smoke test article', description: 'A temporary test article.', body: 'An article for a disposable environment.', published: false }
+await request('/admin/blog', 'POST', article, 201)
+assert(!(await request('/blog', 'GET', undefined, 200, false)).some(post => post.slug === article.slug))
+await request('/admin/blog', 'POST', { ...article, published: true }, 201)
+assert.equal((await request('/blog/' + article.slug, 'GET', undefined, 200, false)).body, article.body)
+await request('/admin/blog', 'POST', article, 201)
+if (process.env.DATABASE_URL) {
+  const { Db } = (await import('../dist/database.js')).default
+  const { Mail } = (await import('../dist/auth.js')).default
+  const { Payments } = (await import('../dist/payments.js')).default
+  const db = new Db()
+  try {
+    const code = 'TEST-' + suffix.toUpperCase()
+    await request('/admin/coupons', 'POST', {
+      code, type: 'PERCENT', value: 10, minimumOrder: 0, maximumDiscount: 10000, active: true,
+      startsAt: new Date(Date.now() - 60_000).toISOString(), endsAt: new Date(Date.now() + 60_000).toISOString(), usageLimit: 1, perUserLimit: 1,
+    }, 201)
+    const nextDraft = await request('/invitations', 'POST', payload, 201)
+    const payments = new Payments(db, new Mail())
+    const attempts = await Promise.allSettled([payments.prepare(draft.id, 'ONLINE', code), payments.prepare(nextDraft.id, 'ONLINE', code)])
+    const claims = attempts.filter(result => result.status === 'fulfilled')
+    assert.equal(claims.length, 1)
+    const order = claims[0].value
+    assert.equal(order.discount, 10000)
+    assert.equal(order.amount, order.offerPrice - order.discount)
+    const gatewayOrderId = 'order_test' + suffix
+    const gatewayPaymentId = 'pay_test' + suffix
+    const gatewayOrder = await db.order.update({ where: { id: order.id }, data: { gatewayOrderId } })
+    payments.gateway = async () => ({ id: gatewayPaymentId, status: 'authorized', order_id: gatewayOrderId, amount: order.amount, currency: 'INR' })
+    await assert.rejects(payments.confirmOnline(gatewayOrder, gatewayPaymentId))
+    payments.gateway = async () => ({ id: gatewayPaymentId, status: 'captured', order_id: gatewayOrderId, amount: order.amount, currency: 'INR' })
+    const published = await payments.confirmOnline(gatewayOrder, gatewayPaymentId)
+    assert.deepEqual(await payments.confirmOnline(gatewayOrder, gatewayPaymentId), published)
+
+    await db.invitation.update({ where: { id: assisted.id }, data: { finalEventAt: new Date(Date.now() - 1000) } })
+    await request('/invitations/' + assisted.id, 'PATCH', payload, 409)
+    await request('/admin/invitations/' + assisted.id + '/archive', 'POST', undefined, 201)
+    assert.equal((await request('/invitations/' + assisted.id)).status, 'ARCHIVED')
+    await request('/public/invite/' + slug, 'GET', undefined, 200, false)
+  } finally { await db.$disconnect() }
+}
 await request('/auth/logout', 'POST', undefined, 201)
 await request('/auth/me', 'GET', undefined, 401)
-console.log('MySQL workflow passed: catalog, authentication, drafts, private media, offline activation, QR, RSVP and activity logs.')
+console.log('MySQL workflow passed: catalog, authentication, drafts, private media, offline activation, QR, RSVP, guest import, reports, blog and audit logs.')

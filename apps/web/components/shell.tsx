@@ -37,11 +37,11 @@ export function Header() {
     {search && <form action="/templates" className="wrap search-panel"><input autoFocus name="q" aria-label="Search templates" placeholder="Search templates, e.g. Bengali Wedding" /><button className="button">Search</button></form>}
   </header>
 }
-export function Footer() {
+export function Footer({ description }: { description: string }) {
   return <footer className="footer"><div className="wrap footer-grid">
-    <div><Brand /><p>Beautiful digital invitations for every celebration.</p></div>
+    <div><Brand /><p>{description}</p></div>
     <div><strong>Explore</strong><Link href="/templates/bengali-wedding">Bengali Wedding</Link><Link href="/templates">All templates</Link><Link href="/pricing">Pricing</Link></div>
-    <div><strong>InviteIdeas</strong><Link href="/#how-it-works">How It Works</Link><Link href="/blog">Blog</Link><Link href="/contact">Contact</Link></div>
-    <div><strong>Account & help</strong><Link href="/dashboard">My invitations</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></div>
+    <div><strong>InviteIdeas</strong><Link href="/#how-it-works">How It Works</Link><Link href="/blog">Blog</Link><Link href="/contact">Contact</Link><Link href="/about">About</Link></div>
+    <div><strong>Account & help</strong><Link href="/dashboard">My invitations</Link><Link href="/faq">FAQ</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></div>
   </div><div className="wrap copyright">© {new Date().getFullYear()} InviteIdeas</div></footer>
 }

@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import { AdminController } from './admin'
 import { AdminGuard, AuthController, AuthGuard, AuthService, Mail } from './auth'
+import { ContentController } from './content'
+import { CouponController } from './coupons'
 import { Db, origin } from './core'
 import { Invitations, InvitationsController } from './invitations'
 import { PaymentController, Payments } from './payments'
@@ -18,7 +20,7 @@ if (!secret || secret.length < 32) throw new Error('Set JWT_SECRET to a random v
 
 @Module({
   imports: [JwtModule.register({ secret }), ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }])],
-  controllers: [AuthController, InvitationsController, PaymentController, AdminController],
+  controllers: [AuthController, InvitationsController, PaymentController, AdminController, ContentController, CouponController],
   providers: [Db, AuthGuard, AdminGuard, AuthService, Mail, Invitations, Payments, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 class AppModule {}

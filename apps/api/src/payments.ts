@@ -4,6 +4,7 @@ import { Prisma, type Order } from './generated/client'
 import { z } from 'zod'
 import { AdminGuard, AuthGuard, type AuthRequest, Mail } from './auth'
 import { Db, note, origin, publicSlug, short, validate, verifyMac } from './core'
+import { couponCode, couponDiscount } from './coupons'
 import { Invitations } from './invitations'
 
 const gatewayId = z.string().regex(/^[A-Za-z0-9_]{1,80}$/)
@@ -25,22 +26,40 @@ export class Payments {
     if (!response.ok) throw new ServiceUnavailableException('Razorpay rejected the request.')
     return response.json() as Promise<T>
   }
-  async prepare(id: string, method: Order['method']) {
+  async prepare(id: string, method: Order['method'], promo?: string) {
     return this.db.$transaction(async tx => {
       const invitation = await tx.invitation.findUniqueOrThrow({ where: { id }, include: { order: true, templateVersion: { include: { template: true } } } })
       if (invitation.order) {
         if (invitation.order.method !== method || invitation.order.status !== 'PENDING') throw new ConflictException('An order already exists.')
+        if (promo && invitation.order.couponCode !== promo) throw new ConflictException('This order already has a fixed checkout amount.')
         return invitation.order
       }
       const updated = await tx.invitation.updateMany({ where: { id, status: 'DRAFT', finalEventAt: { gt: new Date() } }, data: { status: 'PAYMENT_PENDING' } })
       if (!updated.count) throw new ConflictException('This invitation is no longer available for checkout.')
       const { regularPrice, offerPrice } = invitation.templateVersion.template
-      return tx.order.create({ data: { invitationId: id, method, source: invitation.source, regularPrice, offerPrice, amount: offerPrice } })
-    })
+      let discount = 0
+      if (promo) {
+        await tx.$queryRaw`SELECT code FROM coupons WHERE code = ${promo} FOR UPDATE`
+        const coupon = await tx.coupon.findUnique({ where: { code: promo } })
+        const now = new Date()
+        if (!coupon || !coupon.active || coupon.startsAt > now || coupon.endsAt <= now || offerPrice < coupon.minimumOrder) {
+          throw new BadRequestException('This coupon is unavailable for your order.')
+        }
+        const reservations = { couponCode: promo, status: { in: ['PENDING', 'SUCCESS'] as ('PENDING' | 'SUCCESS')[] } }
+        const total = coupon.usageLimit === null ? 0 : await tx.order.count({ where: reservations })
+        const userTotal = await tx.order.count({ where: { ...reservations, invitation: { ownerId: invitation.ownerId } } })
+        if ((coupon.usageLimit !== null && total >= coupon.usageLimit) || userTotal >= coupon.perUserLimit) {
+          throw new ConflictException('This coupon has reached its usage limit.')
+        }
+        discount = couponDiscount(offerPrice, coupon)
+        if (!discount) throw new BadRequestException('This coupon does not reduce the current price.')
+      }
+      return tx.order.create({ data: { invitationId: id, method, source: invitation.source, regularPrice, offerPrice, couponCode: promo, discount, amount: offerPrice - discount } })
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
   }
-  async start(id: string, method: 'ONLINE' | 'LINK', actorId?: string) {
+  async start(id: string, method: 'ONLINE' | 'LINK', actorId?: string, promo?: string) {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) throw new ServiceUnavailableException('Razorpay is unavailable.')
-    const order = await this.prepare(id, method)
+    const order = await this.prepare(id, method, promo)
     return this.db.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM orders WHERE id = ${order.id} FOR UPDATE`
       const current = await tx.order.findUniqueOrThrow({ where: { id: order.id } })
@@ -91,9 +110,10 @@ export class PaymentController {
 
   @UseGuards(AuthGuard)
   @Post('invitations/:id/checkout')
-  async checkout(@Req() req: AuthRequest, @Param('id') id: string) {
+  async checkout(@Req() req: AuthRequest, @Param('id') id: string, @Body() body: unknown) {
     await this.invitations.own(id, req.account)
-    return this.payments.start(id, 'ONLINE')
+    const input = validate(z.object({ code: couponCode.optional() }), body || {})
+    return this.payments.start(id, 'ONLINE', undefined, input.code)
   }
 
   @UseGuards(AuthGuard)

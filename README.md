@@ -54,12 +54,14 @@ npm test
 npm run build
 ```
 
-The initial schema migration is in `apps/api/prisma/migrations`. Add future migrations with the Prisma CLI from `apps/api`, using a development database. Deploy committed migrations with `npm run db:deploy`.
+Schema migrations are in `apps/api/prisma/migrations`. Add future migrations with the Prisma CLI from `apps/api`, using a development database. Deploy committed migrations with `npm run db:deploy`.
+
+With the web and API servers running against a disposable seeded database, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the shell and run `node apps/api/test/smoke.mjs`. It writes test accounts, invitations, photos, payment records and blog entries. Set `DATABASE_URL` to the same disposable database and build the API first to exercise coupon limit races, gateway capture responses, exact-time locking and archiving.
 
 ## Hostinger deployment
 
 1. Provision the Hostinger server with Node.js 24, MySQL 8.4, Nginx, PM2 and Certbot. Use a dedicated MySQL user and a dedicated application user.
-2. Clone the repository and configure the root `.env`. Set an HTTPS `APP_ORIGIN`, an absolute `STORAGE_DIR`, integration credentials and a support email. Export `APP_ORIGIN`, `API_ORIGIN` and `SUPPORT_EMAIL` for the web build and process environment.
+2. Clone the repository and configure the root `.env`. Set an HTTPS `APP_ORIGIN`, an absolute `STORAGE_DIR`, integration credentials and a support email. Set `API_ORIGIN` only if the API listens on a different local origin.
 3. Run `npm ci`, `npm run db:deploy`, `npm run build` and `npm run db:seed`. Remove the bootstrap password from the environment after provisioning.
 4. Run `pm2 start deploy/ecosystem.config.cjs --update-env`, save the process list and set up PM2 startup. Use the supplied Nginx configuration as a starting point and replace the example domain.
 5. Validate and reload Nginx, then request TLS with `certbot --nginx -d your-domain.example`. Verify HTTPS, payment webhooks and account email delivery. Keep ports 3000, 4000 and 3306 private.
@@ -70,5 +72,6 @@ The initial schema migration is in `apps/api/prisma/migrations`. Add future migr
 - A missing catalog usually means the database migration or seed has not run. Inspect API startup logs and verify the migration status.
 - Preview links require the owner or an admin to sign in. A public URL and QR become available after activation. Editing closes at the start time of the last event. The editor currently accepts times in IST.
 - Active customers retain the saved template version and order price snapshot. Changes to a catalog version apply to new drafts.
+- Coupon limits include open Razorpay orders because those orders can still be paid. The saved order includes the original prices, coupon, discount and final amount.
 - Payment verification may arrive after the browser returns. Check the dashboard and Razorpay webhook delivery history before attempting any manual resolution.
-- This implementation covers the core buying and admin-assisted flows. The brief also calls for a fuller CMS and blog, coupons, refund operations, formal policy pages, more granular roles, a visual template builder, expanded analytics, additional templates and broader storefront localization. Those items require further implementation. Public invitation labels are available in English, Bengali and Hindi. The supplied example policy copy requires business review before launch.
+- This implementation covers the core buying and admin-assisted flows. The admin console includes editable homepage copy, FAQ, contact details, SEO, blog posts and sales reports and coupon management. The brief also calls for refund operations, configurable taxes, formal policy pages, more granular roles, a visual template builder, expanded analytics and notifications, additional templates and broader storefront localization. Those items require further implementation. Public invitation labels are available in English, Bengali and Hindi. The supplied example policy copy requires business review before launch.

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Req, Param, Patch, BadRequestException } from '@nestjs/common'
+import { Body, Controller, Get, Post, UseGuards, Req, Param, Patch, Query, BadRequestException } from '@nestjs/common'
 import { z } from 'zod'
 import { AdminGuard, AuthGuard, AuthService, Mail, type AuthRequest } from './auth'
 import { Db, email, note, short, slug, secureUrl, validate } from './core'
@@ -27,6 +27,30 @@ export class AdminController {
       this.db.order.aggregate({ where: { status: 'SUCCESS' }, _sum: { amount: true }, _count: true }),
     ])
     return { users, invitations: invitations.map(invitation => this.invitations.present(invitation)), orders, logs, totals }
+  }
+
+  @Get('reports')
+  report(@Query() raw: unknown) {
+    const dates = validate(z.object({ from: z.iso.date().optional(), to: z.iso.date().optional() }), raw)
+    if (dates.from && dates.to && dates.from > dates.to) throw new BadRequestException('The start must be on or before the end date.')
+    const paidAt = {
+      gte: dates.from ? new Date(dates.from + 'T00:00:00+05:30') : undefined,
+      lt: dates.to ? new Date(Date.parse(dates.to + 'T00:00:00+05:30') + 86_400_000) : undefined,
+    }
+    return this.db.order.groupBy({ by: ['source', 'method'], where: { status: 'SUCCESS', paidAt }, _sum: { amount: true }, _count: true })
+  }
+
+  @Post('invitations/:id/archive')
+  async archive(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.db.$transaction(async tx => {
+      const changed = await tx.invitation.updateMany({
+        where: { id, status: { in: ['ACTIVE', 'LOCKED'] }, finalEventAt: { lte: new Date() } },
+        data: { status: 'ARCHIVED' },
+      })
+      if (!changed.count) throw new BadRequestException('Only invitations with a completed final event can be archived.')
+      await tx.activityLog.create({ data: audit(req.account.id, 'INVITATION_ARCHIVED', id) })
+      return { ok: true }
+    })
   }
 
   @Post('customers')

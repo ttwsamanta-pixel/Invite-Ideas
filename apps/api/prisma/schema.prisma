@@ -172,6 +172,9 @@ model Order {
   offerPrice Int
   amount Int
   currency String @default("INR")
+  couponCode String?
+  coupon Coupon? @relation(fields: [couponCode], references: [code])
+  discount Int @default(0)
   gatewayOrderId String? @unique
   paymentLinkId String? @unique
   paymentLinkUrl String?
@@ -180,6 +183,7 @@ model Order {
   offlineNotes String? @db.Text
   paidAt DateTime?
   createdAt DateTime @default(now())
+  @@index([couponCode, status])
   @@map("orders")
 }
 model Guest {
@@ -222,4 +226,44 @@ model ActivityLog {
   createdAt DateTime @default(now())
   @@index([createdAt])
   @@map("activity_logs")
+}
+
+model Setting {
+  key String @id
+  value Json
+  @@map("settings")
+}
+
+model BlogPost {
+  slug String @id
+  category String
+  title String
+  description String @db.Text
+  body String @db.Text
+  image String?
+  seoTitle String?
+  seoDescription String?
+  publishedAt DateTime?
+  updatedAt DateTime @updatedAt
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+enum CouponType {
+  FIXED
+  PERCENT
+}
+
+model Coupon {
+  code String @id
+  type CouponType
+  value Int
+  minimumOrder Int
+  maximumDiscount Int?
+  startsAt DateTime
+  endsAt DateTime
+  usageLimit Int?
+  perUserLimit Int
+  active Boolean
+  orders Order[]
+  @@map("coupons")
 }
