@@ -20,13 +20,51 @@ export class AdminController {
   @Get()
   async dashboard() {
     const [users, invitations, orders, logs, totals] = await Promise.all([
-      this.db.user.findMany({ where: { role: 'CUSTOMER' }, orderBy: { createdAt: 'desc' }, take: 100, select: { id: true, name: true, email: true, verifiedAt: true } }),
+      this.db.user.findMany({ where: { role: 'CUSTOMER' }, orderBy: { createdAt: 'desc' }, take: 100, select: { id: true, name: true, email: true, verifiedAt: true, createdAt: true } }),
       this.db.invitation.findMany({ take: 100, orderBy: { createdAt: 'desc' }, select: { id: true, title: true, source: true, status: true, slug: true, finalEventAt: true, owner: { select: { name: true } } } }),
-      this.db.order.findMany({ take: 100, orderBy: { createdAt: 'desc' }, include: { invitation: { select: { title: true } } } }),
+      this.db.order.findMany({ take: 100, orderBy: { createdAt: 'desc' }, include: { invitation: { select: { title: true, owner: { select: { name: true, email: true } }, templateVersion: { select: { template: { select: { image: true, category: { select: { name: true } } } } } } } } } }),
       this.db.activityLog.findMany({ take: 50, orderBy: { createdAt: 'desc' }, include: { actor: { select: { name: true } } } }),
       this.db.order.aggregate({ where: { status: 'SUCCESS' }, _sum: { amount: true }, _count: true }),
     ])
     return { users, invitations: invitations.map(invitation => this.invitations.present(invitation)), orders, logs, totals }
+  }
+
+  @Get('overview')
+  async overview(@Query() query: unknown) {
+    const { days } = validate(z.object({ days: z.enum(['7', '30', '90']).default('30') }), query)
+    const now = new Date()
+    const day = 86_400_000
+    const offset = 19_800_000
+    const today = Math.floor((now.getTime() + offset) / day) * day - offset
+    const start = new Date(today - (Number(days) - 1) * day)
+    const end = new Date(today + day)
+    const date = { gte: start, lt: end }
+    const [customers, states, expired, pending, rsvp, paid, daily] = await Promise.all([
+      this.db.user.count({ where: { role: 'CUSTOMER' } }),
+      this.db.invitation.groupBy({ by: ['status'], _count: true }),
+      this.db.invitation.count({ where: { status: 'ACTIVE', finalEventAt: { lte: now } } }),
+      this.db.order.count({ where: { status: 'PENDING' } }),
+      this.db.rsvp.count({ where: { createdAt: date } }),
+      this.db.order.groupBy({ by: ['method'], where: { status: 'SUCCESS', paidAt: date }, _sum: { amount: true } }),
+      this.db.$queryRaw<{ date: string; revenue: bigint; orders: bigint }[]>`
+        SELECT DATE_FORMAT(DATE_ADD(paidAt, INTERVAL 330 MINUTE), '%Y-%m-%d') AS date,
+          SUM(amount) AS revenue, COUNT(*) AS orders
+        FROM orders WHERE status = 'SUCCESS' AND paidAt >= ${start} AND paidAt < ${end}
+        GROUP BY date ORDER BY date
+      `,
+    ])
+    const status: Record<string, number> = { ACTIVE: 0, DRAFT: 0, PAYMENT_PENDING: 0, LOCKED: 0, ARCHIVED: 0 }
+    for (const row of states) status[row.status] = row._count
+    status.ACTIVE -= expired
+    status.LOCKED += expired
+    const offline = paid.find(row => row.method === 'OFFLINE')?._sum.amount ?? 0
+    const revenue = paid.reduce((total, row) => total + (row._sum.amount ?? 0), 0)
+    const series = Array.from({ length: Number(days) }, (_, index) => {
+      const date = new Date(start.getTime() + offset + index * day).toISOString().slice(0, 10)
+      const row = daily.find(entry => entry.date === date)
+      return { date, revenue: Number(row?.revenue ?? 0), orders: Number(row?.orders ?? 0) }
+    })
+    return { customers, status, pending, rsvp, revenue, offline, online: revenue - offline, series }
   }
 
   @Get('reports')

@@ -4,26 +4,38 @@ import { AdminContent } from './admin-content'
 import { AdminCoupons } from './admin-coupons'
 import { AdminReports } from './admin-reports'
 import { useEffect, useState, type FormEvent } from 'react'
-import { api } from '../lib/client'
+import { useRouter } from 'next/navigation'
+import { api, HttpError } from '../lib/client'
+import { AdminOverview, AdminWorkspace, OrderTable, type AdminData, type Section } from './admin-workspace'
 import { money, type Template } from '../lib/data'
 
-type Customer = { id: string; name: string; email: string; verifiedAt?: string }
-type AdminData = {
-  users: Customer[]
-  invitations: { id: string; title: string; status: string; source: string; slug?: string; owner: { name: string } }[]
-  orders: { id: string; invitation: { title: string }; amount: number; status: string; method: string; paymentLinkUrl?: string }[]
-  logs: { id: string; action: string; createdAt: string; actor: { name: string } }[]
-  totals: { _sum: { amount: number | null }; _count: number }
-}
 export function Admin() {
+  const router = useRouter()
+  const [section, setSection] = useState<Section>('Dashboard')
+  const [account, setAccount] = useState<{ name: string; email: string }>()
+  function select(next: Section) {
+    setSection(next)
+    setMessage('')
+    window.scrollTo({ top: 0 })
+  }
   const [data, setData] = useState<AdminData>()
   const [templates, setTemplates] = useState<Template[]>([])
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   useEffect(() => {
-    Promise.all([api<AdminData>('/admin'), api<Template[]>('/admin/templates')]).then(([items, designs]) => { setData(items); setTemplates(designs) }).catch(failure => setError(failure.message))
-  }, [])
+    let active = true
+    Promise.all([api<AdminData>('/admin'), api<Template[]>('/admin/templates'), api<{ name: string; email: string }>('/auth/me')])
+      .then(([items, designs, profile]) => {
+        if (active) { setData(items); setTemplates(designs); setAccount(profile) }
+      })
+      .catch(failure => {
+        if (!active) return
+        if (failure instanceof HttpError && failure.status === 401) router.replace('/login')
+        else setError(failure instanceof HttpError && failure.status === 403 ? 'This workspace requires an admin account.' : failure.message)
+      })
+    return () => { active = false }
+  }, [router])
   async function run(action: () => Promise<unknown>, success: string) {
     setBusy(true); setError(''); setMessage('')
     try {
@@ -36,24 +48,27 @@ export function Admin() {
     event.preventDefault()
     return new FormData(event.currentTarget)
   }
-  return <section className="wrap content stack"><div className="inline"><h1>Admin</h1><Link href="/dashboard" className="button outline">My Invitations</Link></div>
+  return <AdminWorkspace section={section} select={select} data={data} templates={templates} account={account}>
+    {section !== 'Dashboard' && <div className="aw-heading"><h1>{section}</h1></div>}
     {error && <p role="alert" className="error">{error}</p>}{message && <p role="status" className="success">{message}</p>}
     {!data && !error && <p role="status">Loading admin panel…</p>}
     {data && <>
-      <section className="panel stack"><h2>Overview</h2><p>{data.totals._count} paid orders · {money(data.totals._sum.amount || 0)} collected</p></section>
-      <AdminReports />
-      <section className="panel stack"><h2>Customers</h2>
-        <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/customers', 'POST', Object.fromEntries(fields)), 'Customer saved.') }}>
+      {section === 'Dashboard' && <AdminOverview name={account?.name} data={data} select={select} />}
+      {section === 'Reports' && <AdminReports />}
+      <div className="aw-module">
+      {section === 'Customers' && <section className="panel stack"><h2>Customers</h2>
+        <form id="aw-add-customer" className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/customers', 'POST', Object.fromEntries(fields)), 'Customer saved.') }}>
           <label>Full name<input required name="name" /></label><label>Email address<input required name="email" type="email" /></label><button className="button small" disabled={busy}>Save customer</button>
         </form>
-        <div className="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Actions</th></tr></thead><tbody>{data.users.map(customer => <tr key={customer.id}><td>{customer.name}</td><td>{customer.email}</td><td className="inline">
+        <div className="table-wrap" id="aw-customer-list"><table><thead><tr><th>Name</th><th>Email</th><th>Actions</th></tr></thead><tbody>{data.users.map(customer => <tr key={customer.id} id={'aw-item-' + customer.id}><td>{customer.name}</td><td>{customer.email}</td><td className="inline">
           <Link className="button outline small" href={'/editor/new?owner=' + customer.id}>Create invitation</Link>
           <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/customers/' + customer.id + '/activation', 'POST'), 'Account email sent.')}>{customer.verifiedAt ? 'Send sign-in email' : 'Send activation email'}</button>
         </td></tr>)}</tbody></table></div>
-      </section>
-      <section className="panel stack"><h2>Invitations and payments</h2>
-        {data.invitations.map(item => <div className="stack" key={item.id}><div className="inline"><strong>{item.title}</strong><span>{item.owner.name} · {item.status}</span>{item.slug && <Link href={'/invite/' + item.slug}>Public invitation</Link>}
-          {['DRAFT', 'ACTIVE', 'PAYMENT_PENDING'].includes(item.status) && <Link className="button outline small" href={'/editor/new?edit=' + item.id}>Edit</Link>}
+      </section>}
+      {(section === 'Invitations' || section === 'Payments' || section === 'Payment Links') && <section className="panel stack"><h2>{section === 'Invitations' ? 'Invitation records' : section === 'Payment Links' ? 'Admin-assisted invitations' : 'Manage payments'}</h2>
+        {section === 'Payment Links' && <p>Choose an admin-assisted draft to create a payment link.</p>}
+        {data.invitations.filter(item => section === 'Invitations' || item.source === 'ADMIN').map(item => <div className="aw-invitation-row stack" key={item.id} id={'aw-item-' + item.id}><div className="inline"><strong>{item.title}</strong><span>{item.owner.name} · {item.status}</span>{item.slug && <Link href={'/invite/' + item.slug}>Public invitation</Link>}
+          {['DRAFT', 'ACTIVE'].includes(item.status) && <Link className="button outline small" href={'/editor/new?edit=' + item.id}>Edit</Link>}
 {item.status === 'LOCKED' && <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/invitations/' + item.id + '/archive', 'POST'), 'Invitation archived.')}>Archive</button>}{item.source === 'ADMIN' && ['DRAFT', 'PAYMENT_PENDING'].includes(item.status) && <button className="button outline small" disabled={busy} onClick={() => run(() => api('/admin/invitations/' + item.id + '/payment-link', 'POST'), 'Payment link is available under Orders.')}>Create payment link</button>}</div>
           {item.source === 'ADMIN' && item.status === 'DRAFT' && <details><summary>Record a verified offline payment</summary>
             <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/invitations/' + item.id + '/offline-payment', 'POST', Object.fromEntries(fields)), 'Offline payment recorded and invitation activated.') }}>
@@ -61,16 +76,17 @@ export function Admin() {
               <label>Reference<input name="reference" required maxLength={150} /></label><label>Notes<input name="notes" /></label><button className="button small" disabled={busy}>Verify payment</button>
             </form></details>}
         </div>)}
-        <h3>Orders</h3>
-        <div className="table-wrap"><table><thead><tr><th>Invitation</th><th>Amount</th><th>Status</th><th>Method</th></tr></thead><tbody>{data.orders.map(item => <tr key={item.id}>
-          <td>{item.invitation.title}</td><td>{money(item.amount)}</td><td>{item.status}</td><td>{item.method} {item.paymentLinkUrl && <a href={item.paymentLinkUrl} target="_blank" rel="noreferrer">Open payment link</a>}</td>
-        </tr>)}</tbody></table></div>
-      </section>
-      <section className="panel stack"><h2>Catalog</h2>
+        {section === 'Payment Links' && <OrderTable orders={data.orders.filter(order => order.method === 'LINK')} />}
+        {section === 'Payments' && <OrderTable orders={data.orders} />}
+      </section>}
+      {section === 'Orders' && <section className="panel stack"><h2>Order history</h2><OrderTable orders={data.orders} /></section>}
+      {section === 'Categories' && <section className="panel stack"><h2>Manage categories</h2>
         <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/categories', 'POST', Object.fromEntries(fields)), 'Category saved.') }}>
           <label>Category slug<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" /></label><label>Category name<input name="name" required /></label><button className="button small" disabled={busy}>Save category</button>
         </form>
-        {templates.map(template => <details key={template.slug}><summary>{template.name} · {money(template.offerPrice)}</summary>
+      </section>}
+      {section === 'Templates' && <section className="panel stack"><h2>Manage templates</h2>
+        {templates.map(template => <details key={template.slug} id={'aw-item-' + template.slug}><summary>{template.name} · {money(template.offerPrice)}</summary>
           <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/templates/' + template.slug, 'PATCH', {
             regularPrice: Math.round(Number(fields.get('regular')) * 100), offerPrice: Math.round(Number(fields.get('offer')) * 100), featured: fields.get('featured') === 'on', active: fields.get('active') === 'on',
           }), 'Template updated.') }}>
@@ -81,7 +97,7 @@ export function Admin() {
             <label>Version configuration (JSON)<textarea name="config" required defaultValue={JSON.stringify(template.versions[0]?.config, null, 2)} /></label><button className="button small" disabled={busy}>Publish new version</button>
           </form>
         </details>)}
-        <details><summary>Create a new template</summary><form className="stack" onSubmit={event => {
+        <details id="aw-add-template"><summary>Create a new template</summary><form className="stack" onSubmit={event => {
           const fields = form(event)
           void run(() => api('/admin/templates', 'POST', JSON.parse(String(fields.get('template')))), 'Template created.')
         }}>
@@ -89,13 +105,14 @@ export function Admin() {
             slug: 'new-design', name: 'New design', description: '', image: '/images/bengali.webp', style: 'Traditional', categoryId: 'bengali-wedding', classification: 'Standard', regularPrice: 149900, offerPrice: 129900,
             config: { theme: 'ruby', names: 'Sample Names', image: '/images/bengali.webp', sections: ['events', 'countdown', 'rsvp'] },
           }, null, 2)} /></label><button className="button small" disabled={busy}>Create template</button></form></details>
-      </section>
-      <section className="panel stack"><h2>Music library</h2><form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/music', 'POST', Object.fromEntries(fields)), 'Licensed track added.') }}>
+      </section>}
+      {section === 'Music Library' && <section className="panel stack"><h2>Music library</h2><form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/music', 'POST', Object.fromEntries(fields)), 'Licensed track added.') }}>
         <label>Track name<input name="name" required /></label><label>Artist<input name="artist" required /></label><label>License reference<input name="license" required /></label><label>HTTPS audio URL<input name="file" type="url" required /></label><button className="button small" disabled={busy}>Add track</button>
-      </form></section>
-      <AdminCoupons />
-      <AdminContent />
-      <section className="panel stack"><h2>Recent activity</h2>{data.logs.map(log => <p key={log.id}>{new Date(log.createdAt).toLocaleString('en-IN')} · {log.actor.name} · {log.action.replaceAll('_', ' ').toLowerCase()}</p>)}</section>
+      </form></section>}
+      {section === 'Coupons' && <AdminCoupons />}
+      {section === 'CMS' && <AdminContent />}
+      {section === 'Activity Logs' && <section className="panel stack"><h2>Recent activity</h2>{data.logs.map(log => <p key={log.id}>{new Date(log.createdAt).toLocaleString('en-IN')} · {log.actor.name} · {log.action.replaceAll('_', ' ').toLowerCase()}</p>)}</section>}
+      </div>
     </>}
-  </section>
+  </AdminWorkspace>
 }
