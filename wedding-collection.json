@@ -412,5 +412,51 @@
         "music"
       ]
     }
+  },
+  {
+    "slug": "olive-wax-seal",
+    "name": "Olive Wax Seal",
+    "category": "wedding",
+    "style": "Botanical",
+    "tier": "Luxury",
+    "price": 249900,
+    "regular": 279900,
+    "description": "An olive envelope with a wax seal opens to reveal a botanical wedding invitation.",
+    "featured": true,
+    "config": {
+      "theme": "sage",
+      "layout": "frame",
+      "opening": "envelope",
+      "names": "Mira & Neel",
+      "image": "/images/wedding/olive-wax-seal.webp",
+      "language": "en",
+      "place": "Udaipur",
+      "events": [
+        "Welcome dinner",
+        "Wedding ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "attire",
+          "label": "Dress code",
+          "example": "Garden formal. Soft colours and comfortable shoes are welcome."
+        },
+        {
+          "key": "arrival",
+          "label": "Arrival and parking",
+          "example": "Please use the garden entrance. Valet parking is available at the main gate."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
   }
 ]

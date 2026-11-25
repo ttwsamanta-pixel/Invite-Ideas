@@ -5,7 +5,7 @@ import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddin
 import { Invitations } from './invitations'
 
 const imagePath = z.string().regex(/^\/images\/(?:wedding\/)?[a-z0-9-]+\.webp$/)
-const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
 const priceSchema = z.object({
   regularPrice: z.number().int().min(100).max(10_000_000),
   offerPrice: z.number().int().min(100).max(10_000_000),

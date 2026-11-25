@@ -40,3 +40,79 @@
   .wedding-split .wedding-hero, .wedding-split #invitation-events { grid-template-columns:1fr; }
   .wedding-split .wedding-hero img { min-height:0; height:250px; }
 }
+
+.invitation[hidden] { display: none; }
+.envelope-opening {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 20px;
+  min-height: min(690px, 80svh);
+  padding: 36px 16px;
+  text-align: center;
+  background: radial-gradient(ellipse at center, #fffaf0, #eee8da);
+}
+.envelope-opening h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: #39412b;
+  font: 500 clamp(1.8rem, 5vw, 3.7rem)/1.05 var(--serif);
+}
+.envelope-trigger { display: grid; justify-items: center; gap: 17px; border-radius: 5px; color: #39412b; background: transparent; }
+.envelope-art {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  perspective: 760px;
+  width: clamp(235px, 58vw, 420px);
+  aspect-ratio: 1.57;
+  margin-top: 20px;
+  filter: drop-shadow(0 13px 18px #40381b28);
+}
+.envelope-back, .envelope-pocket, .envelope-flap { position: absolute; inset: 0; border-radius: 5px; }
+.envelope-back { background: #4c5838; }
+.envelope-letter {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  inset: 8% 7% 8%;
+  padding: 8px;
+  border: 1px solid #bfb18d;
+  background: #fff9e7;
+  color: #38402a;
+  font: 500 clamp(1rem, 3.5vw, 2rem)/1.15 var(--serif);
+  overflow-wrap: anywhere;
+}
+.envelope-pocket {
+  background: linear-gradient(165deg, #6c754d, #4c5838);
+  clip-path: polygon(0 0, 50% 61%, 100% 0, 100% 100%, 0 100%);
+}
+.envelope-flap {
+  height: 65%;
+  background: linear-gradient(174deg, #849068, #535f3c);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+}
+.envelope-seal {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  width: clamp(42px, 11vw, 60px);
+  aspect-ratio: 1;
+  border: 3px ridge #b88051;
+  border-radius: 48% 51% 47% 53%;
+  color: #fff3cf;
+  background: radial-gradient(circle at 38% 30%, #975e3d, #66361f);
+  font: 700 .78rem var(--serif);
+}
+.envelope-action { border-radius: 100px; padding: 9px 22px; color: #fffbef; background: #4b573b; font-weight: 700; }
+.envelope-trigger[data-opening="true"] .envelope-seal { opacity: 0; transition: opacity .2s ease; }
+.envelope-trigger[data-opening="true"] .envelope-flap { transform: rotateX(180deg); transition: transform .5s .1s ease-in-out; }
+.envelope-trigger[data-opening="true"] .envelope-letter { animation: invitation-letter-rise .66s .37s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes invitation-letter-rise {
+  from { transform: translateY(0); }
+  75%, to { transform: translateY(-68%); }
+}

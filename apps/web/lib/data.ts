@@ -1,7 +1,7 @@
 import catalog from '../../../catalog.json'
 import weddingCollection from '../../../wedding-collection.json'
 
-export type Config = { theme: string; names: string; image: string; sections: string[]; layout?: 'frame' | 'split' | 'cover'; language?: 'en' | 'bn' | 'hi'; place?: string; events?: string[]; fields?: { key: string; label: string; example?: string }[] }
+export type Config = { theme: string; names: string; image: string; sections: string[]; layout?: 'frame' | 'split' | 'cover'; opening?: 'envelope'; language?: 'en' | 'bn' | 'hi'; place?: string; events?: string[]; fields?: { key: string; label: string; example?: string }[] }
 export type Template = {
   slug: string; name: string; description: string; image: string; style: string; badge: string | null
   categoryId: string; category: { slug: string; name: string }; offerPrice: number; regularPrice: number

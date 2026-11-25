@@ -2,7 +2,8 @@
 import './wedding-editions.css'
 import Link from 'next/link'
 import Script from 'next/script'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { EnvelopeOpening } from './envelope-opening'
 import { api } from '../lib/client'
 import { money, type Invitation } from '../lib/data'
 
@@ -17,6 +18,10 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
   const t = labels[invitation.language]
   const config = invitation.config
   const sections = config?.sections || []
+  const [opened, setOpened] = useState(false)
+  const headline = useRef<HTMLHeadingElement>(null)
+  const sealed = config?.opening === 'envelope' && !opened
+  useEffect(() => { if (opened) headline.current?.focus() }, [opened])
   const [remaining, setRemaining] = useState<number>()
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState('')
@@ -47,11 +52,13 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
   const formatDate = new Intl.DateTimeFormat(invitation.language, { year: 'numeric', month: 'long', day: 'numeric', timeZone: invitation.timezone })
   const eventDate = ceremony && normalizeDate(formatDate.formatRange(new Date(ceremony.startsAt), new Date(invitation.finalEventAt)))
   const detailHeading = { en: 'Guest information', bn: 'অতিথিদের জন্য তথ্য', hi: 'मेहमानों के लिए जानकारी' }[invitation.language]
-  return <article className={'invitation ' + (config?.theme || '') + (config?.layout ? ' wedding-edition wedding-' + config.layout : '')} lang={invitation.language}>
+  return <>
+    {sealed && <EnvelopeOpening names={invitation.names} language={invitation.language} onOpen={() => setOpened(true)} />}
+    <article hidden={sealed} className={'invitation ' + (config?.theme || '') + (config?.layout ? ' wedding-edition wedding-' + config.layout : '')} lang={invitation.language}>
     {config?.layout ? <>
       <header className="wedding-hero">
         <img src={config.image} alt="" fetchPriority="high" />
-        <div className="wedding-cover-copy"><p>{t.invited}</p><h1>{invitation.names}</h1><strong className="wedding-invitation-title">{invitation.title}</strong><span>{eventDate}</span></div>
+        <div className="wedding-cover-copy"><p>{t.invited}</p><h1 ref={headline} tabIndex={-1}>{invitation.names}</h1><strong className="wedding-invitation-title">{invitation.title}</strong><span>{eventDate}</span></div>
       </header>
       <nav className="wedding-nav" aria-label={t.events}>
         {sections.includes('events') && <a href="#invitation-events">{t.events}</a>}
@@ -61,7 +68,7 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
       </nav>
     </> : <header className={invitation.id ? "invite-top personalized" : "invite-top"}>
       {invitation.id ? <span className="invite-flourish" aria-hidden="true">❦</span> : config?.image && <img src={config.image} alt="" />}
-      <p>{t.invited}</p><h1>{invitation.names}</h1><p>{invitation.title}</p>
+      <p>{t.invited}</p><h1 ref={headline} tabIndex={-1}>{invitation.names}</h1><p>{invitation.title}</p>
     </header>}
     {sections.includes('countdown') && remaining !== undefined && remaining > 0 && <section className="invite-section"><strong>{new Intl.NumberFormat(invitation.language).format(remaining)} {t.remaining}</strong></section>}
     {sections.includes('events') && <section className="invite-section" id="invitation-events"><h2>{t.events}</h2>{invitation.events.map((event, index) => <div key={index}>
@@ -84,7 +91,8 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
       </form>}
     </section>}
     <footer className="invite-section"><Link href="/" aria-label="InviteIdeas"><img src="/images/brand.png" alt="InviteIdeas" width="150" style={{ margin: 'auto' }} /></Link></footer>
-  </article>
+    </article>
+  </>
 }
 type CheckoutOptions = { key: string; order_id: string; amount: number; currency: string; name: string; handler: (data: unknown) => void; modal: { ondismiss: () => void } }
 declare global { interface Window { Razorpay?: new (options: CheckoutOptions) => { open: () => void } } }

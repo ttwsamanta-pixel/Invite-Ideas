@@ -16,6 +16,7 @@ export default async function Design({ params }: { params: Promise<{ slug: strin
       <div><p className="eyebrow">{template.category.name} · {template.style} · {template.classification}</p><h1>{template.name}</h1><p>{template.description}</p><p className="price"><strong>{money(template.offerPrice)}</strong><del>{money(template.regularPrice)}</del></p>
       <div className="hero-buttons"><Link className="button outline" href={'/preview/template/' + slug}>Live Preview</Link><Link className="button" href={'/editor/' + slug}>Use This Template</Link></div>
             <h2>Make it yours</h2><p>Customize names, venues, dates and ceremony times. Choose from Bengali, English and Hindi for invitation labels.</p>
+      {config?.opening === 'envelope' && <p><strong>Interactive opening</strong> · Guests open an animated wax-seal envelope to reveal the invitation.</p>}
       {config?.events && <p><strong>Sample schedule</strong> · {config.events.join(' · ')}</p>}
       {config?.fields?.length ? <p><strong>Guest information</strong> · {config.fields.map(field => field.label).join(' · ')}</p> : null}
       {config?.sections && <p>{[{ key: 'gallery', label: 'Photo gallery' }, { key: 'countdown', label: 'Countdown' }, { key: 'music', label: 'Background music' }, { key: 'rsvp', label: 'RSVP' }].filter(feature => config.sections.includes(feature.key)).map(feature => feature.label).join(' · ')}</p>}
