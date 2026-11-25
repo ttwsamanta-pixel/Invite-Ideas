@@ -960,3 +960,5 @@ th {
     object-position: 65% 48%;
   }
 }
+
+@media (min-width: 901px) { .filters { grid-template-columns: repeat(5, minmax(94px, 1fr)); } }

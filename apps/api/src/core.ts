@@ -23,12 +23,22 @@ export const password = z.string().min(12).max(128)
 export const note = z.string().trim().max(4000).default('')
 export const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(75)
 export const secureUrl = z.url({ protocol: /^https$/ }).max(190)
+const detailKey = z.string().regex(/^[a-z][a-z0-9-]{0,30}$/)
+export const weddingField = z.object({ key: detailKey, label: short, example: z.string().max(500).optional() })
+export const weddingLayout = z.enum(['frame', 'split', 'cover'])
+export const weddingTheme = z.enum(['ruby', 'rose', 'night', 'marigold', 'teal', 'green', 'midnight', 'sage', 'ochre', 'jade', 'scarlet', 'coastal', 'plum'])
+export const weddingDetails = z.record(detailKey, z.string().trim().max(500)).refine(fields => Object.keys(fields).length <= 10)
+export function selectWeddingDetails(config: unknown, values: Record<string, string>) {
+  const fields = z.object({ fields: z.array(weddingField).max(10) }).safeParse(config)
+  return Object.fromEntries((fields.success ? fields.data.fields : []).flatMap(({ key }) => Object.hasOwn(values, key) && values[key] ? [[key, values[key]]] : []))
+}
+
 export const invitationBody = z.object({
   title: short, names: short, language: z.enum(['en', 'bn', 'hi']),
   timezone: z.string().max(100).refine(zone => {
     try { new Intl.DateTimeFormat('en', { timeZone: zone }); return true } catch { return false }
   }).default('Asia/Kolkata'),
-  story: note, family: note, rsvpEnabled: z.boolean().default(true), musicId: z.uuid().nullable().default(null),
+  story: note, family: note, details: weddingDetails.optional(), rsvpEnabled: z.boolean().default(true), musicId: z.uuid().nullable().default(null),
   events: z.array(z.object({
     name: short, startsAt: z.iso.datetime({ offset: true }).transform(value => new Date(value)),
     venue: short, mapUrl: secureUrl.optional(), description: note,

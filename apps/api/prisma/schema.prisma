@@ -123,6 +123,7 @@ model Invitation {
   timezone String @default("Asia/Kolkata")
   story String @db.Text
   family String @db.Text
+  details Json?
   rsvpEnabled Boolean @default(true)
   musicId String?
   music MusicTrack? @relation(fields: [musicId], references: [id])

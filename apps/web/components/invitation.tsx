@@ -1,4 +1,5 @@
 'use client'
+import './wedding-editions.css'
 import Link from 'next/link'
 import Script from 'next/script'
 import { useEffect, useState, type FormEvent } from 'react'
@@ -10,7 +11,9 @@ const labels = {
   bn: { invited: 'আপনাকে সাদর আমন্ত্রণ', events: 'অনুষ্ঠানসূচি', map: 'ঠিকানা দেখুন', gallery: 'ছবির গ্যালারি', story: 'আমাদের গল্প', family: 'পরিবারের পক্ষ থেকে', rsvp: 'উপস্থিতি জানান', name: 'আপনার নাম', email: 'ইমেল', party: 'অতিথি', yes: 'উপস্থিত থাকব', no: 'উপস্থিত থাকতে পারব না', submit: 'উত্তর পাঠান', thanks: 'উত্তর দেওয়ার জন্য ধন্যবাদ।', remaining: 'দিন বাকি' },
   hi: { invited: 'आप सादर आमंत्रित हैं', events: 'कार्यक्रम', map: 'स्थान देखें', gallery: 'तस्वीरें', story: 'हमारी कहानी', family: 'हमारे परिवार की ओर से', rsvp: 'उपस्थिति की पुष्टि', name: 'आपका नाम', email: 'ईमेल', party: 'मेहमान', yes: 'उपस्थित रहूँगा', no: 'उपस्थित नहीं रह पाऊँगा', submit: 'उत्तर भेजें', thanks: 'उत्तर देने के लिए धन्यवाद।', remaining: 'दिन शेष' },
 }
-export function InvitationView({ invitation, slug }: { invitation: Invitation; slug?: string }) {
+const normalizeDate = (value: string) => value.replace(/[\u00a0\u2009\u202f]/g, ' ')
+
+export function InvitationView({ invitation, slug, sample = false }: { invitation: Invitation; slug?: string; sample?: boolean }) {
   const t = labels[invitation.language]
   const config = invitation.config
   const sections = config?.sections || []
@@ -29,6 +32,7 @@ export function InvitationView({ invitation, slug }: { invitation: Invitation; s
   }, [slug])
   async function respond(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (sample) { setAnswer(t.thanks); return }
     const data = new FormData(event.currentTarget)
     setError(''); setBusy(true)
     try {
@@ -38,22 +42,41 @@ export function InvitationView({ invitation, slug }: { invitation: Invitation; s
       setAnswer(t.thanks)
     } catch (failure) { setError((failure as Error).message) } finally { setBusy(false) }
   }
-  return <article className={'invitation ' + (config?.theme || '')} lang={invitation.language}>
-    <header className={invitation.id ? "invite-top personalized" : "invite-top"}>
+  const guestDetails = config?.fields?.filter(field => invitation.details?.[field.key]) || []
+  const ceremony = invitation.events[0]
+  const formatDate = new Intl.DateTimeFormat(invitation.language, { year: 'numeric', month: 'long', day: 'numeric', timeZone: invitation.timezone })
+  const eventDate = ceremony && normalizeDate(formatDate.formatRange(new Date(ceremony.startsAt), new Date(invitation.finalEventAt)))
+  const detailHeading = { en: 'Guest information', bn: 'অতিথিদের জন্য তথ্য', hi: 'मेहमानों के लिए जानकारी' }[invitation.language]
+  return <article className={'invitation ' + (config?.theme || '') + (config?.layout ? ' wedding-edition wedding-' + config.layout : '')} lang={invitation.language}>
+    {config?.layout ? <>
+      <header className="wedding-hero">
+        <img src={config.image} alt="" fetchPriority="high" />
+        <div className="wedding-cover-copy"><p>{t.invited}</p><h1>{invitation.names}</h1><strong className="wedding-invitation-title">{invitation.title}</strong><span>{eventDate}</span></div>
+      </header>
+      <nav className="wedding-nav" aria-label={t.events}>
+        {sections.includes('events') && <a href="#invitation-events">{t.events}</a>}
+        {sections.includes('gallery') && invitation.gallery.length > 0 && <a href="#invitation-gallery">{t.gallery}</a>}
+        {guestDetails.length > 0 && <a href="#guest-information">{detailHeading}</a>}
+        {sections.includes('rsvp') && invitation.rsvpEnabled && (slug || sample) && <a href="#invitation-rsvp">{t.rsvp}</a>}
+      </nav>
+    </> : <header className={invitation.id ? "invite-top personalized" : "invite-top"}>
       {invitation.id ? <span className="invite-flourish" aria-hidden="true">❦</span> : config?.image && <img src={config.image} alt="" />}
       <p>{t.invited}</p><h1>{invitation.names}</h1><p>{invitation.title}</p>
-    </header>
+    </header>}
     {sections.includes('countdown') && remaining !== undefined && remaining > 0 && <section className="invite-section"><strong>{new Intl.NumberFormat(invitation.language).format(remaining)} {t.remaining}</strong></section>}
-    {sections.includes('events') && <section className="invite-section"><h2>{t.events}</h2>{invitation.events.map((event, index) => <div key={index}>
-      <h3>{event.name}</h3><p>{new Intl.DateTimeFormat(invitation.language, { dateStyle: 'full', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(event.startsAt))}</p><p>{event.venue}</p>
+    {sections.includes('events') && <section className="invite-section" id="invitation-events"><h2>{t.events}</h2>{invitation.events.map((event, index) => <div key={index}>
+      <h3>{event.name}</h3><p>{normalizeDate(new Intl.DateTimeFormat(invitation.language, { dateStyle: 'full', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(event.startsAt)))}</p><p>{event.venue}</p>
       {event.description && <p>{event.description}</p>}{event.mapUrl && <a className="button outline small" href={event.mapUrl} target="_blank" rel="noreferrer">{t.map}</a>}
     </div>)}</section>}
-    {sections.includes('gallery') && invitation.gallery.length > 0 && <section className="invite-section"><h2>{t.gallery}</h2><div className="gallery">{invitation.gallery.map(image => <img key={image.id} src={image.url} alt={t.gallery} loading="lazy" />)}</div></section>}
+    {guestDetails.length > 0 && <section className="invite-section wedding-details" id="guest-information"><h2>{detailHeading}</h2>
+      <dl>{guestDetails.map(field => <div key={field.key}><dt>{field.label}</dt><dd>{invitation.details?.[field.key]}</dd></div>)}</dl>
+    </section>}
+    {sections.includes('gallery') && invitation.gallery.length > 0 && <section className="invite-section" id="invitation-gallery"><h2>{t.gallery}</h2><div className="gallery">{invitation.gallery.map(image => <img key={image.id} src={image.url} alt={t.gallery} loading="lazy" />)}</div></section>}
     {sections.includes('story') && invitation.story && <section className="invite-section"><h2>{t.story}</h2><p>{invitation.story}</p></section>}
     {sections.includes('family') && invitation.family && <section className="invite-section"><h2>{t.family}</h2><p>{invitation.family}</p></section>}
     {sections.includes('music') && invitation.music && <section className="invite-section"><p>{invitation.music.name}</p><audio controls preload="none" src={invitation.music.file} /></section>}
-    {sections.includes('rsvp') && invitation.rsvpEnabled && slug && remaining !== undefined && remaining > 0 && <section className="invite-section"><h2>{t.rsvp}</h2>
-      {answer ? <p role="status" className="success">{answer}</p> : <form className="stack" onSubmit={respond}>
+    {sections.includes('rsvp') && invitation.rsvpEnabled && (slug || sample) && remaining !== undefined && remaining > 0 && <section className="invite-section" id="invitation-rsvp"><h2>{t.rsvp}</h2>
+      {sample && <p>Try the sample RSVP. Responses are discarded.</p>}{answer ? <p role="status" className="success">{answer}</p> : <form className="stack" onSubmit={respond}>
         <label>{t.name}<input name="name" required maxLength={180} /></label><label>{t.email}<input name="email" required type="email" maxLength={190} /></label>
         <label>{t.rsvp}<select name="attending"><option value="yes">{t.yes}</option><option value="no">{t.no}</option></select></label>
         <label>{t.party}<input name="party" type="number" min={1} max={12} defaultValue={1} required /></label>

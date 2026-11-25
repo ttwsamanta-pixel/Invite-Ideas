@@ -1,6 +1,7 @@
 import { Db } from '../src/database'
 import { hash } from 'argon2'
 import catalog from '../../../catalog.json'
+import weddingCollection from '../../../wedding-collection.json'
 
 const db = new Db()
 async function seed() {
@@ -16,6 +17,17 @@ async function seed() {
         slug, name, categoryId, style, badge, offerPrice, regularPrice, description,
         image: '/images/' + image + '.webp', classification: badge === 'Premium' ? 'Premium' : 'Standard', featured: true,
         versions: { create: { number: 1, config: { theme, names, image: '/images/' + image + '.webp', sections: ['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'] } } },
+      },
+    })
+  }
+  for (const design of weddingCollection) {
+    await db.template.upsert({
+      where: { slug: design.slug }, update: {},
+      create: {
+        slug: design.slug, name: design.name, categoryId: design.category, style: design.style,
+        classification: design.tier, badge: design.tier, image: design.config.image,
+        offerPrice: design.price, regularPrice: design.regular, description: design.description, featured: design.featured,
+        versions: { create: { number: 1, config: design.config } },
       },
     })
   }

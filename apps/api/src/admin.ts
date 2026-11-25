@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards, Req, Param, Patch, Query, BadRequestException } from '@nestjs/common'
 import { z } from 'zod'
 import { AdminGuard, AuthGuard, AuthService, Mail, type AuthRequest } from './auth'
-import { Db, email, note, short, slug, secureUrl, validate } from './core'
+import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddingLayout, weddingTheme } from './core'
 import { Invitations } from './invitations'
 
-const imagePath = z.string().regex(/^\/images\/[a-z0-9-]+\.webp$/)
-const configSchema = z.object({ theme: z.enum(['ruby', 'rose', 'night', 'marigold']), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const imagePath = z.string().regex(/^\/images\/(?:wedding\/)?[a-z0-9-]+\.webp$/)
+const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
 const priceSchema = z.object({
   regularPrice: z.number().int().min(100).max(10_000_000),
   offerPrice: z.number().int().min(100).max(10_000_000),

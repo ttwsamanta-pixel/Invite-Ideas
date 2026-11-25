@@ -10,7 +10,7 @@ import type { Invitation, Template } from '../lib/data'
 
 const short = z.string().trim().min(1, 'Required').max(180)
 const schema = z.object({
-  title: short, names: short, language: z.enum(['en', 'bn', 'hi']), story: z.string().max(4000), family: z.string().max(4000),
+  title: short, names: short, language: z.enum(['en', 'bn', 'hi']), story: z.string().max(4000), family: z.string().max(4000), details: z.record(z.string(), z.string().max(500)),
   rsvpEnabled: z.boolean(), musicId: z.string(),
   events: z.array(z.object({ name: short, date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/), venue: short, mapUrl: z.union([z.url({ protocol: /^https$/ }), z.literal('')]), description: z.string().max(4000) })).min(1).max(20),
 })
@@ -28,11 +28,11 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
   const [template, setTemplate] = useState(selected || templates[0]?.slug || '')
-  const { register, reset, control, handleSubmit, formState } = useForm<Fields>({
+  const { register, reset, control, handleSubmit, formState, getValues, setValue } = useForm<Fields>({
     resolver: zodResolver(schema),
-    defaultValues: { title: '', names: '', language: 'en', story: '', family: '', rsvpEnabled: true, musicId: '', events: [emptyEvent] },
+    defaultValues: { title: '', names: '', language: 'en', story: '', family: '', details: {}, rsvpEnabled: true, musicId: '', events: [emptyEvent] },
   })
-  const { fields, append, remove } = useFieldArray({ control, name: 'events' })
+  const { fields, append, remove, replace } = useFieldArray({ control, name: 'events' })
   useEffect(() => {
     let live = true
     const access = id ? api<Invitation>('/invitations/' + id) : api('/auth/me')
@@ -41,7 +41,7 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
       if (id) {
         const invitation = result as Invitation
         setExisting(invitation)
-        reset({ ...invitation, musicId: invitation.musicId || '', events: invitation.events.map(item => ({ ...item, mapUrl: item.mapUrl || '', date: indiaLocal(item.startsAt) })) })
+        reset({ ...invitation, details: invitation.details || {}, musicId: invitation.musicId || '', events: invitation.events.map(item => ({ ...item, mapUrl: item.mapUrl || '', date: indiaLocal(item.startsAt) })) })
       }
       setReady(true)
     }).catch(failure => {
@@ -52,13 +52,20 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
     api<Track[]>('/music').then(tracks => { if (live) setTrackList(tracks) }).catch(() => undefined)
     return () => { live = false }
   }, [id, reset, router])
+  const config = existing?.templateVersion?.config || templates.find(item => item.slug === template)?.versions[0]?.config
+  useEffect(() => {
+    if (id || !config?.events) return
+    const hasEventDetails = getValues('events').some(event => event.date || event.venue || event.mapUrl || event.description)
+    if (!hasEventDetails) replace(config.events.map(name => ({ ...emptyEvent, name })))
+    if (config.language && !formState.dirtyFields.language) setValue('language', config.language)
+  }, [config, id, getValues, replace, setValue, formState.dirtyFields.language])
   const locked = existing && !['DRAFT', 'ACTIVE'].includes(existing.status || '')
   const save = handleSubmit(async data => {
     setError('')
     try {
       const path = id ? '/invitations/' + id : owner ? '/admin/invitations' : '/invitations'
       const saved = await api<Invitation>(path, id ? 'PATCH' : 'POST', {
-        ...data, template, ownerId: owner, timezone: 'Asia/Kolkata', musicId: data.musicId || null,
+        ...data, details: Object.fromEntries((config?.fields || []).map(field => [field.key, data.details[field.key] || ''])), template, ownerId: owner, timezone: 'Asia/Kolkata', musicId: data.musicId || null,
         events: data.events.map(({ date, mapUrl, ...event }) => ({ ...event, mapUrl: mapUrl || undefined, startsAt: date + ':00+05:30' })),
       })
       router.push(owner ? '/admin' : '/preview/invitation/' + saved.previewToken)
@@ -96,6 +103,9 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
         {fields.length > 1 && <button type="button" className="button outline small" onClick={() => remove(index)}>Remove event {index + 1}</button>}</fieldset>)}
         {fields.length < 20 && <button type="button" className="button outline" onClick={() => append(emptyEvent)}>Add another event</button>}
       </section>
+      {config?.fields?.length ? <section className="panel stack"><h2>Guest information</h2>
+        {config.fields.map(field => <label key={field.key}>{field.label}<textarea {...register(`details.${field.key}`)} maxLength={500} /></label>)}
+      </section> : null}
       <section className="panel stack"><h2>Personal touches</h2><label>Story<textarea {...register('story')} maxLength={4000} /></label><label>Family or additional message<textarea {...register('family')} maxLength={4000} /></label><label>Background music<select {...register('musicId')}><option value="">No music</option>{trackList.map(track => <option value={track.id} key={track.id}>{track.name} · {track.artist}</option>)}</select></label>
       <label className="checkbox"><input type="checkbox" {...register('rsvpEnabled')} /> Enable guest RSVP</label></section>
       {Object.keys(formState.errors).length > 0 && <p role="alert" className="error">Check the required fields, event dates and HTTPS map links.</p>}

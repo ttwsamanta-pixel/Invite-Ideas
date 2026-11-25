@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Cake, CircleEllipsis, Eye, Gem, Heart, House, Lamp, Flower2, CookingPot, CircleDot, SearchX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { categories, money, type Template } from '../lib/data'
+import { categories, matchesOccasion, money, type Template } from '../lib/data'
 import { useFavorites } from './shell'
 
 const icons = [CircleDot, Flower2, Gem, Cake, CookingPot, Lamp, House, Heart, CircleEllipsis]
@@ -38,11 +38,12 @@ export function Card({ template, index }: { template: Template; index: number })
 export function Market({ templates, allCategories = categories, home = false, initialCategory = '', query = '', saved = false }: { templates: Template[]; allCategories?: typeof categories; home?: boolean; initialCategory?: string; query?: string; saved?: boolean }) {
   const [category, setCategory] = useState(initialCategory)
   const [style, setStyle] = useState('')
+  const [tier, setTier] = useState('')
   const [budget, setBudget] = useState('')
   const [sort, setSort] = useState('')
   const ids = useFavorites(state => state.ids)
   useEffect(() => { void useFavorites.persist.rehydrate() }, [])
-  const filtered = templates.filter(item => (!category || item.categoryId === category) && (!style || item.style === style) && (!budget || item.offerPrice <= Number(budget)) && (!saved || ids.includes(item.slug)) && (!query || (item.name + ' ' + item.category.name + ' ' + item.style + ' ' + item.description).toLowerCase().includes(query.toLowerCase())))
+  const filtered = templates.filter(item => matchesOccasion(item, category) && (!style || item.style === style) && (!tier || item.classification === tier) && (!budget || item.offerPrice <= Number(budget)) && (!saved || ids.includes(item.slug)) && (!query || (item.name + ' ' + item.category.name + ' ' + item.style + ' ' + item.description).toLowerCase().includes(query.toLowerCase())))
   if (sort === 'asc') filtered.sort((a, b) => a.offerPrice - b.offerPrice)
   if (sort === 'desc') filtered.sort((a, b) => b.offerPrice - a.offerPrice)
   if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name))
@@ -54,11 +55,12 @@ export function Market({ templates, allCategories = categories, home = false, in
       <div className="filters">
         <label>Occasion<select value={category} onChange={e => setCategory(e.target.value)}><option value="">All occasions</option>{allCategories.map(item => <option value={item.slug} key={item.slug}>{item.name}</option>)}</select></label>
         <label>Style<select value={style} onChange={e => setStyle(e.target.value)}><option value="">All styles</option>{[...new Set(templates.map(item => item.style))].map(option => <option key={option}>{option}</option>)}</select></label>
+        <label>Collection<select value={tier} onChange={e => setTier(e.target.value)}><option value="">All tiers</option>{["Basic", "Standard", "Premium", "Luxury"].map(value => <option key={value}>{value}</option>)}</select></label>
         <label>Price<select value={budget} onChange={e => setBudget(e.target.value)}><option value="">All prices</option><option value="100000">Up to ₹1,000</option><option value="150000">Up to ₹1,500</option></select></label>
         <label>Sort by<select value={sort} onChange={e => setSort(e.target.value)}><option value="">Featured</option><option value="asc">Price, low first</option><option value="desc">Price, high first</option><option value="name">Name</option></select></label>
       </div>
     </div>
-    {filtered.length ? <div className="template-grid">{(home ? filtered.slice(0, 4) : filtered).map((template, index) => <Card key={template.slug} template={template} index={index} />)}</div> : <div className="empty"><SearchX /><p>{saved ? 'Save a design with the heart button to find it here.' : 'No invitations match these filters.'}</p>{!saved && <button className="button outline" onClick={() => { setCategory(''); setBudget(''); setStyle('') }}>Clear filters</button>}</div>}
+    {filtered.length ? <div className="template-grid">{(home ? filtered.slice(0, 4) : filtered).map((template, index) => <Card key={template.slug} template={template} index={index} />)}</div> : <div className="empty"><SearchX /><p>{saved ? 'Save a design with the heart button to find it here.' : 'No invitations match these filters.'}</p>{!saved && <button className="button outline" onClick={() => { setCategory(''); setBudget(''); setStyle(''); setTier('') }}>Clear filters</button>}</div>}
     {home && <div className="center"><Link className="button outline" href="/templates">View All Templates</Link></div>}
   </section>
 }

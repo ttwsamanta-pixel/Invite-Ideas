@@ -1,0 +1,42 @@
+.wedding-edition { max-width: 1060px; background: var(--wedding-paper, #fbf5ea); color: var(--wedding-ink, #262720); --card-ink: var(--wedding-ink, #262720); }
+.wedding-edition.teal { --wedding-ink:#123e40; --wedding-paper:#f5f0e6; --wedding-motif:#be944d; }
+.wedding-edition.green { --wedding-ink:#244030; --wedding-paper:#f9efdc; --wedding-motif:#a57034; }
+.wedding-edition.midnight { --wedding-ink:#1a2f55; --wedding-paper:#edf0f6; --wedding-motif:#9a7d53; }
+.wedding-edition.sage { --wedding-ink:#364639; --wedding-paper:#f9f7ed; --wedding-motif:#94805a; }
+.wedding-edition.ochre { --wedding-ink:#723717; --wedding-paper:#fff0d9; --wedding-motif:#ad711d; }
+.wedding-edition.jade { --wedding-ink:#254a37; --wedding-paper:#fff5d8; --wedding-motif:#b0883b; }
+.wedding-edition.scarlet { --wedding-ink:#752238; --wedding-paper:#fff0e8; --wedding-motif:#aa613b; }
+.wedding-edition.coastal { --wedding-ink:#244754; --wedding-paper:#f6f2eb; --wedding-motif:#a46a62; }
+.wedding-edition.plum { --wedding-ink:#462138; --wedding-paper:#fcf0e1; --wedding-motif:#9d632e; }
+.wedding-hero { position:relative; display:grid; isolation:isolate; color:var(--wedding-ink); }
+.wedding-hero img { width:100%; height:100%; object-fit:cover; }
+.wedding-cover-copy { display:grid; align-content:center; justify-items:center; gap:16px; padding:clamp(24px,6vw,75px); }
+.wedding-cover-copy p { font-size:.9rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.wedding-cover-copy h1 { color:inherit; overflow-wrap:anywhere; font-size:clamp(2.9rem,7.5vw,6.5rem); line-height:1.03; }
+.wedding-cover-copy span { border-top:1px solid currentColor; padding-top:12px; font-family:var(--serif); font-size:1.1rem; }
+.wedding-split .wedding-hero { grid-template-columns:1.05fr 1fr; min-height:400px; }
+.wedding-split .wedding-hero img { min-height:360px; }
+.wedding-cover .wedding-hero { min-height:clamp(435px,62vw,620px); color:white; }
+.wedding-cover .wedding-hero img { position:absolute; inset:0; z-index:-2; }
+.wedding-cover .wedding-hero::after { content:""; position:absolute; inset:0; z-index:-1; background:#10101876; }
+.wedding-cover .wedding-cover-copy { text-shadow:0 2px 14px #1b0c19be; }
+.wedding-frame .wedding-hero { border:1px solid var(--wedding-motif); margin:clamp(13px,3vw,35px); }
+.wedding-frame .wedding-hero img { width:calc(100% - 28px); height:clamp(170px,32vw,330px); margin:14px 14px 0; }
+.wedding-frame .wedding-cover-copy { padding:clamp(22px,4vw,45px); }
+.wedding-nav { display:flex; justify-content:center; flex-wrap:wrap; gap:12px 24px; padding:17px 12px; border-block:1px solid color-mix(in srgb,var(--wedding-motif),transparent 65%); font-weight:700; }
+.wedding-nav a { text-decoration:underline; text-underline-offset:5px; }
+.wedding-edition .invite-section { gap:18px; padding:clamp(24px,4vw,53px) clamp(16px,5vw,68px); border-color:color-mix(in srgb,var(--wedding-motif),transparent 65%); }
+.wedding-edition .invite-section h2 { color:inherit; font-size:clamp(1.8rem,4vw,3rem); }
+.wedding-edition .invite-section > p { max-width:60ch; margin-inline:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+.wedding-edition #invitation-events > div { border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 56%); padding:20px 12px; }
+.wedding-split #invitation-events { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.wedding-split #invitation-events h2 { grid-column:1 / -1; }
+.wedding-cover #invitation-events > div { border-width:0 0 1px; }
+.wedding-details dl { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); gap:14px; }
+.wedding-details dl div { padding:15px; background:#ffffff65; border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 62%); }
+.wedding-details dt { font-weight:700; padding-bottom:4px; }
+.wedding-details dd { white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:650px) {
+  .wedding-split .wedding-hero, .wedding-split #invitation-events { grid-template-columns:1fr; }
+  .wedding-split .wedding-hero img { min-height:0; height:250px; }
+}

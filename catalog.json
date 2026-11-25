@@ -59,6 +59,34 @@
     [
       "other",
       "Other"
+    ],
+    [
+      "sikh-wedding",
+      "Sikh Wedding"
+    ],
+    [
+      "south-indian-wedding",
+      "South Indian Wedding"
+    ],
+    [
+      "nikah-wedding",
+      "Nikah"
+    ],
+    [
+      "christian-wedding",
+      "Christian Wedding"
+    ],
+    [
+      "gujarati-wedding",
+      "Gujarati Wedding"
+    ],
+    [
+      "marathi-wedding",
+      "Marathi Wedding"
+    ],
+    [
+      "destination-wedding",
+      "Destination Wedding"
     ]
   ],
   "templates": [

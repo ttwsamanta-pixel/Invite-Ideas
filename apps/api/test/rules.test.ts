@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
 import { test } from 'node:test'
 import { couponDiscount } from '../src/coupons'
-import { assertEditable, finalEvent, invitationBody, publicSlug, verifyMac } from '../src/core'
+import { assertEditable, finalEvent, invitationBody, publicSlug, selectWeddingDetails, verifyMac } from '../src/core'
 
 test('the final event is calculated by instant across timezone offsets', () => {
   const parsed = invitationBody.parse({
@@ -48,4 +48,9 @@ test('coupon discounts respect maximum discounts and minimum payable amounts', (
   assert.equal(couponDiscount(149900, { type: 'PERCENT', value: 10, maximumDiscount: null }), 14990)
   assert.equal(couponDiscount(149900, { type: 'PERCENT', value: 10, maximumDiscount: 10000 }), 10000)
   assert.equal(couponDiscount(79900, { type: 'FIXED', value: 100000, maximumDiscount: null }), 79800)
+})
+test('wedding guest information only retains fields from its saved template version', () => {
+  const config = { fields: [{ key: 'gurdwara', label: 'Gurdwara and entry guidance' }, { key: 'langar', label: 'Langar details' }] }
+  assert.deepEqual(selectWeddingDetails(config, { gurdwara: 'Use the north gate', langar: '', private: 'Omitted' }), { gurdwara: 'Use the north gate' })
+  assert.deepEqual(selectWeddingDetails({ theme: 'ruby' }, { gurdwara: 'Omitted' }), {})
 })

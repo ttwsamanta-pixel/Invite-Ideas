@@ -6,7 +6,7 @@ import { toFile } from 'qrcode'
 import sharp from 'sharp'
 import { z } from 'zod'
 import { AuthGuard, type Account, type AuthRequest } from './auth'
-import { assertEditable, Db, digest, email, finalEvent, invitationBody, note, origin, short, slug, storage, token, validate } from './core'
+import { assertEditable, Db, digest, email, finalEvent, invitationBody, note, origin, short, slug, storage, token, validate, selectWeddingDetails } from './core'
 
 const include = { events: { orderBy: { startsAt: 'asc' as const } }, templateVersion: { include: { template: true } }, order: true, gallery: true, music: true, _count: { select: { responses: true, views: true } } } as const
 
@@ -26,25 +26,25 @@ export class Invitations {
   }
   async create(raw: unknown, ownerId: string, source: 'CUSTOMER' | 'ADMIN') {
     const input = validate(invitationBody.extend({ template: slug }), raw)
-    const { template, events, ...fields } = input
+    const { template, events, details, ...fields } = input
     const version = await this.db.templateVersion.findFirst({ where: { templateId: template, template: { active: true } }, orderBy: { number: 'desc' } })
     if (!version) throw new NotFoundException('Template unavailable.')
     const finalEventAt = finalEvent(events)
     if (finalEventAt <= new Date()) throw new BadRequestException('Enter a future final event date and time.')
     await this.checkMusic(fields.musicId)
-    return this.db.invitation.create({ data: { ...fields, ownerId, source, templateVersionId: version.id, finalEventAt, previewToken: token(), events: { create: events } }, include })
+    return this.db.invitation.create({ data: { ...fields, details: selectWeddingDetails(version.config, details || {}), ownerId, source, templateVersionId: version.id, finalEventAt, previewToken: token(), events: { create: events } }, include })
   }
   async edit(id: string, account: Account, raw: unknown) {
     const current = await this.own(id, account)
     assertEditable(current)
-    const { events, ...fields } = validate(invitationBody, raw)
+    const { events, details, ...fields } = validate(invitationBody, raw)
     const finalEventAt = finalEvent(events)
     if (finalEventAt <= new Date()) throw new BadRequestException('Enter a future final event date and time.')
     if (fields.musicId !== current.musicId) await this.checkMusic(fields.musicId)
     return this.db.$transaction(async tx => {
       const result = await tx.invitation.updateMany({
         where: { id, updatedAt: current.updatedAt, status: { in: ['DRAFT', 'ACTIVE'] }, finalEventAt: { gt: new Date() } },
-        data: { ...fields, finalEventAt },
+        data: { ...fields, ...(details === undefined ? {} : { details: selectWeddingDetails(current.templateVersion.config, details) }), finalEventAt },
       })
       if (!result.count) throw new ConflictException('The invitation changed. Reload and try again.')
       await tx.event.deleteMany({ where: { invitationId: id } })
@@ -61,8 +61,8 @@ export class Invitations {
     return invitation
   }
   publicFields(invitation: Awaited<ReturnType<Invitations['eventPage']>>) {
-    const { title, names, language, timezone, story, family, rsvpEnabled, finalEventAt, events, gallery, music, templateVersion } = invitation
-    return { id: invitation.slug ? invitation.slug : invitation.id, title, names, language, timezone, story, family, rsvpEnabled, finalEventAt, events, gallery: gallery.map(asset => ({ id: asset.id, url: '/api/public/media/' + asset.id })), music: music ? { name: music.name, file: music.file } : null, config: templateVersion.config }
+    const { title, names, language, timezone, story, family, details, rsvpEnabled, finalEventAt, events, gallery, music, templateVersion } = invitation
+    return { id: invitation.slug ? invitation.slug : invitation.id, title, names, language, timezone, story, family, details, rsvpEnabled, finalEventAt, events, gallery: gallery.map(asset => ({ id: asset.id, url: '/api/public/media/' + asset.id })), music: music ? { name: music.name, file: music.file } : null, config: templateVersion.config }
   }
 }
 @Controller()

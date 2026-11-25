@@ -75,3 +75,7 @@ With the web and API servers running against a disposable seeded database, set `
 - Coupon limits include open Razorpay orders because those orders can still be paid. The saved order includes the original prices, coupon, discount and final amount.
 - Payment verification may arrive after the browser returns. Check the dashboard and Razorpay webhook delivery history before attempting any manual resolution.
 - This implementation covers the core buying and admin-assisted flows. The admin console includes editable homepage copy, FAQ, contact details, SEO, blog posts and sales reports and coupon management. The brief also calls for refund operations, configurable taxes, formal policy pages, more granular roles, a visual template builder, expanded analytics and notifications, additional templates and broader storefront localization. Those items require further implementation. Public invitation labels are available in English, Bengali and Hindi. The supplied example policy copy requires business review before launch.
+
+## Wedding collection
+
+The collection is defined in `wedding-collection.json`. Each design declares its saved template layout, sample ceremony schedule, guest-facing sections, and optional editor fields. Run `npm run db:deploy`, `npm run generate -w api`, and `npm run db:seed` to add the collection to an existing database. The seed adds missing entries and preserves administrator edits to existing templates.

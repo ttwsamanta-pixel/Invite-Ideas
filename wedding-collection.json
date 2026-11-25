@@ -1,0 +1,416 @@
+[
+  {
+    "slug": "phulkari-courtyard",
+    "name": "Phulkari Courtyard",
+    "category": "sikh-wedding",
+    "style": "Heritage",
+    "tier": "Premium",
+    "price": 189900,
+    "regular": 219900,
+    "description": "A sunlit Punjabi invitation framed by embroidered phulkari.",
+    "featured": true,
+    "config": {
+      "theme": "teal",
+      "layout": "split",
+      "names": "Meher & Arjan",
+      "image": "/images/wedding/phulkari-courtyard.webp",
+      "language": "en",
+      "place": "Chandigarh",
+      "events": [
+        "Mehndi",
+        "Milni",
+        "Anand Karaj",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "gurdwara",
+          "label": "Gurdwara and entry guidance",
+          "example": "Please cover your head and remove your shoes before entering."
+        },
+        {
+          "key": "langar",
+          "label": "Langar details",
+          "example": "Langar will be served in the community hall after the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "jasmine-zari",
+    "name": "Jasmine & Zari",
+    "category": "south-indian-wedding",
+    "style": "Traditional",
+    "tier": "Premium",
+    "price": 179900,
+    "regular": 209900,
+    "description": "Temple silk, jasmine and emerald accents for a South Indian wedding.",
+    "featured": false,
+    "config": {
+      "theme": "green",
+      "layout": "frame",
+      "names": "Anjali & Karthik",
+      "image": "/images/wedding/jasmine-zari.webp",
+      "language": "en",
+      "place": "Chennai",
+      "events": [
+        "Nichayathartham",
+        "Muhurtham",
+        "Wedding lunch"
+      ],
+      "fields": [
+        {
+          "key": "muhurtham",
+          "label": "Muhurtham window",
+          "example": "The auspicious ceremony window is 8:15–9:00 am."
+        },
+        {
+          "key": "meal",
+          "label": "Wedding meal details",
+          "example": "Join us for a traditional banana-leaf lunch."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "moonlit-jali",
+    "name": "Moonlit Jali",
+    "category": "nikah-wedding",
+    "style": "Cinematic",
+    "tier": "Luxury",
+    "price": 249900,
+    "regular": 279900,
+    "description": "Silver moonlight and carved latticework set the scene for a Nikah.",
+    "featured": true,
+    "config": {
+      "theme": "midnight",
+      "layout": "cover",
+      "names": "Aaliya & Zayn",
+      "image": "/images/wedding/moonlit-jali.webp",
+      "language": "en",
+      "place": "Hyderabad",
+      "events": [
+        "Mehndi",
+        "Nikah",
+        "Walima"
+      ],
+      "fields": [
+        {
+          "key": "nikah",
+          "label": "Nikah ceremony guidance",
+          "example": "Please arrive before the ceremony begins."
+        },
+        {
+          "key": "walima",
+          "label": "Walima guest information",
+          "example": "Dinner follows in the garden pavilion."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "white-rose-vows",
+    "name": "White Rose Vows",
+    "category": "christian-wedding",
+    "style": "Classic",
+    "tier": "Basic",
+    "price": 69900,
+    "regular": 99900,
+    "description": "A quiet ivory design with white roses and an elegant church setting.",
+    "featured": false,
+    "config": {
+      "theme": "sage",
+      "layout": "frame",
+      "names": "Elena & Daniel",
+      "image": "/images/wedding/white-rose-vows.webp",
+      "language": "en",
+      "place": "Kochi",
+      "events": [
+        "Wedding ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "church",
+          "label": "Church or chapel name",
+          "example": "Our Lady of Hope Chapel"
+        },
+        {
+          "key": "arrival",
+          "label": "Guest arrival instructions",
+          "example": "Please arrive 15 minutes before the service."
+        }
+      ],
+      "sections": [
+        "events",
+        "family",
+        "rsvp"
+      ]
+    }
+  },
+  {
+    "slug": "marigold-raas",
+    "name": "Marigold Raas",
+    "category": "gujarati-wedding",
+    "style": "Festive",
+    "tier": "Standard",
+    "price": 119900,
+    "regular": 149900,
+    "description": "Gujarati textiles and warm marigolds for an invitation full of colour.",
+    "featured": false,
+    "config": {
+      "theme": "ochre",
+      "layout": "split",
+      "names": "Riya & Mihir",
+      "image": "/images/wedding/marigold-raas.webp",
+      "language": "en",
+      "place": "Ahmedabad",
+      "events": [
+        "Garba & Dandiya",
+        "Pithi",
+        "Lagna",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "garba",
+          "label": "Garba attire",
+          "example": "Wear something colourful and comfortable for dancing."
+        },
+        {
+          "key": "baraat",
+          "label": "Baraat meeting point",
+          "example": "Gather at the courtyard gate before the procession."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "paithani-morning",
+    "name": "Paithani Morning",
+    "category": "marathi-wedding",
+    "style": "Traditional",
+    "tier": "Standard",
+    "price": 109900,
+    "regular": 139900,
+    "description": "Mango yellow and Paithani-inspired peacock motifs for a Maharashtrian wedding.",
+    "featured": false,
+    "config": {
+      "theme": "jade",
+      "layout": "frame",
+      "names": "Mrunal & Atharva",
+      "image": "/images/wedding/paithani-morning.webp",
+      "language": "en",
+      "place": "Pune",
+      "events": [
+        "Halad",
+        "Sakharpuda",
+        "Lagna"
+      ],
+      "fields": [
+        {
+          "key": "ritual",
+          "label": "Antarpat and ceremony notes",
+          "example": "Guests are invited to gather near the mandap for the Antarpat."
+        },
+        {
+          "key": "meal",
+          "label": "Guest meal details",
+          "example": "A Maharashtrian lunch will follow the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "alpana-silk",
+    "name": "Alpana & Silk",
+    "category": "bengali-wedding",
+    "style": "Heritage",
+    "tier": "Premium",
+    "price": 169900,
+    "regular": 199900,
+    "description": "Contemporary Bengali stationery with alpana ornaments and embroidered silk.",
+    "featured": false,
+    "config": {
+      "theme": "scarlet",
+      "layout": "split",
+      "names": "ঈশা ও সৌরভ",
+      "image": "/images/wedding/alpana-silk.webp",
+      "language": "bn",
+      "place": "Kolkata",
+      "events": [
+        "গায়ে হলুদ",
+        "শুভ বিবাহ",
+        "বৌভাত"
+      ],
+      "fields": [
+        {
+          "key": "ritual",
+          "label": "বিবাহের অনুষ্ঠান",
+          "example": "শুভদৃষ্টি ও মালাবদলের সময় মণ্ডপের কাছে উপস্থিত থাকুন।"
+        },
+        {
+          "key": "meal",
+          "label": "ভোজের বিবরণ",
+          "example": "বিবাহের পরে নৈশভোজের আয়োজন রয়েছে।"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "salt-and-sunset",
+    "name": "Salt & Sunset",
+    "category": "destination-wedding",
+    "style": "Modern",
+    "tier": "Premium",
+    "price": 199900,
+    "regular": 229900,
+    "description": "A breezy editorial invitation for seaside vows and a weekend away.",
+    "featured": false,
+    "config": {
+      "theme": "coastal",
+      "layout": "split",
+      "names": "Tara & Nikhil",
+      "image": "/images/wedding/salt-and-sunset.webp",
+      "language": "en",
+      "place": "Goa",
+      "events": [
+        "Welcome dinner",
+        "Beach ceremony",
+        "Farewell brunch"
+      ],
+      "fields": [
+        {
+          "key": "stay",
+          "label": "Where to stay",
+          "example": "Guest rooms are available near the beach venue."
+        },
+        {
+          "key": "travel",
+          "label": "Transfers and travel",
+          "example": "A shuttle departs from the main hotel lobby."
+        },
+        {
+          "key": "attire",
+          "label": "Dress code",
+          "example": "Light linens and flat shoes are welcome."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "slug": "amber-jharokha",
+    "name": "Amber Jharokha",
+    "category": "wedding",
+    "style": "Royal",
+    "tier": "Luxury",
+    "price": 259900,
+    "regular": 289900,
+    "description": "Amber-lit stone arches and antique gold for a multi-day celebration.",
+    "featured": true,
+    "config": {
+      "theme": "plum",
+      "layout": "cover",
+      "names": "Avni & Veer",
+      "image": "/images/wedding/amber-jharokha.webp",
+      "language": "en",
+      "place": "Jaipur",
+      "events": [
+        "Mehendi",
+        "Sangeet",
+        "Baraat",
+        "Saat Phere",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "attire",
+          "label": "Dress code",
+          "example": "Jewel tones for the sangeet and festive formalwear for the wedding."
+        },
+        {
+          "key": "arrival",
+          "label": "Arrival and transport",
+          "example": "A guest shuttle will run between the hotel and the courtyard."
+        },
+        {
+          "key": "stay",
+          "label": "Accommodation",
+          "example": "Ask the hosts for the wedding room block."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  }
+]
