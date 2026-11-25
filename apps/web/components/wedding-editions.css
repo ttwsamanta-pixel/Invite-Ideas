@@ -8,111 +8,110 @@
 .wedding-edition.scarlet { --wedding-ink:#752238; --wedding-paper:#fff0e8; --wedding-motif:#aa613b; }
 .wedding-edition.coastal { --wedding-ink:#244754; --wedding-paper:#f6f2eb; --wedding-motif:#a46a62; }
 .wedding-edition.plum { --wedding-ink:#462138; --wedding-paper:#fcf0e1; --wedding-motif:#9d632e; }
-.wedding-hero { position:relative; display:grid; isolation:isolate; color:var(--wedding-ink); }
-.wedding-hero img { width:100%; height:100%; object-fit:cover; }
-.wedding-cover-copy { display:grid; align-content:center; justify-items:center; gap:16px; padding:clamp(24px,6vw,75px); }
-.wedding-cover-copy p { font-size:.9rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
-.wedding-cover-copy h1 { color:inherit; overflow-wrap:anywhere; font-size:clamp(2.9rem,7.5vw,6.5rem); line-height:1.03; }
-.wedding-cover-copy span { border-top:1px solid currentColor; padding-top:12px; font-family:var(--serif); font-size:1.1rem; }
-.wedding-split .wedding-hero { grid-template-columns:1.05fr 1fr; min-height:400px; }
-.wedding-split .wedding-hero img { min-height:360px; }
-.wedding-cover .wedding-hero { min-height:clamp(435px,62vw,620px); color:white; }
+.wedding-hero { position:relative; display:grid; align-items:stretch; isolation:isolate; color:var(--wedding-ink); }
+.wedding-hero img { display:block; width:100%; height:100%; min-width:0; object-fit:cover; }
+.wedding-cover-copy { display:grid; min-width:0; align-content:center; justify-items:center; gap:14px; padding:clamp(25px,5vw,62px); }
+.wedding-cover-copy p { font-size:.8rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; }
+.wedding-cover-copy h1 { color:inherit; overflow-wrap:anywhere; text-wrap:balance; font-size:clamp(2.65rem,6.2vw,5.5rem); font-weight:500; line-height:1.02; }
+.wedding-invitation-title { font-size:1rem; font-weight:400; overflow-wrap:anywhere; }
+.wedding-cover-copy span { border-top:1px solid currentColor; margin-top:5px; padding-top:12px; font-family:var(--serif); font-size:1.15rem; }
+.wedding-split .wedding-hero { grid-template-columns:minmax(0,1fr) minmax(0,1fr); min-height:500px; }
+.wedding-split .wedding-hero img { min-height:400px; }
+.wedding-split.scarlet .wedding-cover-copy { background:#752238; color:#fff1df; }
+.wedding-split.coastal .wedding-hero img { grid-column:2; grid-row:1; }
+.wedding-split.coastal .wedding-cover-copy { grid-column:1; grid-row:1; }
+.wedding-cover .wedding-hero { min-height:clamp(460px,64vw,665px); color:white; }
 .wedding-cover .wedding-hero img { position:absolute; inset:0; z-index:-2; }
-.wedding-cover .wedding-hero::after { content:""; position:absolute; inset:0; z-index:-1; background:#10101876; }
-.wedding-cover .wedding-cover-copy { text-shadow:0 2px 14px #1b0c19be; }
-.wedding-frame .wedding-hero { border:1px solid var(--wedding-motif); margin:clamp(13px,3vw,35px); }
-.wedding-frame .wedding-hero img { width:calc(100% - 28px); height:clamp(170px,32vw,330px); margin:14px 14px 0; }
-.wedding-frame .wedding-cover-copy { padding:clamp(22px,4vw,45px); }
-.wedding-nav { display:flex; justify-content:center; flex-wrap:wrap; gap:12px 24px; padding:17px 12px; border-block:1px solid color-mix(in srgb,var(--wedding-motif),transparent 65%); font-weight:700; }
-.wedding-nav a { text-decoration:underline; text-underline-offset:5px; }
-.wedding-edition .invite-section { gap:18px; padding:clamp(24px,4vw,53px) clamp(16px,5vw,68px); border-color:color-mix(in srgb,var(--wedding-motif),transparent 65%); }
-.wedding-edition .invite-section h2 { color:inherit; font-size:clamp(1.8rem,4vw,3rem); }
-.wedding-edition .invite-section > p { max-width:60ch; margin-inline:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
-.wedding-edition #invitation-events > div { border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 56%); padding:20px 12px; }
-.wedding-split #invitation-events { grid-template-columns:repeat(2,minmax(0,1fr)); }
-.wedding-split #invitation-events h2 { grid-column:1 / -1; }
-.wedding-cover #invitation-events > div { border-width:0 0 1px; }
+.wedding-cover .wedding-hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,#110d1d28,#110d1d85 48%,#110d1dbe); }
+.wedding-cover .wedding-cover-copy { align-content:end; padding-bottom:clamp(40px,8vw,102px); text-shadow:0 2px 14px #1b0c19be; }
+.wedding-frame .wedding-hero { border:1px solid var(--wedding-motif); margin:clamp(13px,4vw,43px); padding:10px; }
+.wedding-frame .wedding-hero img { height:clamp(215px,37vw,395px); }
+.wedding-frame .wedding-cover-copy { padding:clamp(27px,5vw,56px) 14px; }
+.wedding-nav { display:flex; justify-content:center; flex-wrap:wrap; gap:8px 24px; padding:15px; border-block:1px solid color-mix(in srgb,var(--wedding-motif),transparent 65%); font-weight:700; }
+.wedding-nav a { padding:6px 0; text-underline-offset:5px; }
+.wedding-nav a:hover,.wedding-nav a:focus-visible { text-decoration:underline; }
+.wedding-edition .invite-section { gap:22px; padding:clamp(30px,6vw,72px) clamp(16px,6vw,78px); border-color:color-mix(in srgb,var(--wedding-motif),transparent 65%); }
+.wedding-edition .invite-section h2 { color:inherit; font-size:clamp(2rem,4vw,3.35rem); font-weight:500; }
+.wedding-edition .invite-section > p { max-width:60ch; margin-inline:auto; white-space:pre-wrap; overflow-wrap:anywhere; font-size:1.06rem; }
+.wedding-countdown { justify-items:center; gap:3px!important; }
+.wedding-countdown strong { font:500 clamp(2.4rem,6vw,4rem)/1 var(--serif); font-variant-numeric:tabular-nums; }
+.wedding-countdown span { font-size:.9rem; }
+.wedding-schedule { display:grid; gap:14px; width:100%; }
+.wedding-event { display:grid; justify-items:center; align-content:start; gap:7px; padding:25px 16px; overflow-wrap:anywhere; }
+.wedding-event h3 { font:500 clamp(1.35rem,3vw,2rem)/1.13 var(--serif); }
+.wedding-event time { font-size:.93rem; }
+.wedding-venue { font-weight:700; }
+.wedding-edition .wedding-event { border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 55%); background:#ffffff36; }
+.wedding-frame .wedding-event { border-radius:45% 45% 0 0 / 16px 16px 0 0; }
+.wedding-split .wedding-schedule { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.wedding-cover .wedding-schedule { width:min(100%,650px); margin-inline:auto; }
+.wedding-cover .wedding-event { border-width:0 0 1px; background:transparent; }
 .wedding-details dl { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); gap:14px; }
-.wedding-details dl div { padding:15px; background:#ffffff65; border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 62%); }
-.wedding-details dt { font-weight:700; padding-bottom:4px; }
+.wedding-details dl div { padding:22px 17px; border-top:2px solid var(--wedding-motif); background:#ffffff55; }
+.wedding-details dt { font-weight:700; padding-bottom:6px; }
 .wedding-details dd { white-space:pre-wrap; overflow-wrap:anywhere; }
+.wedding-edition .wedding-note { background:color-mix(in srgb,var(--wedding-motif),transparent 90%); }
+.wedding-edition .wedding-family { background:transparent; }
+.wedding-edition .button { background:var(--wedding-ink); border-color:var(--wedding-ink); color:#fff; }
+.wedding-edition .button.outline { background:transparent; color:var(--wedding-ink); }
+.wedding-edition .button:hover { filter:brightness(.9); }
+.wedding-edition .gallery { gap:12px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.wedding-edition .gallery img { aspect-ratio:4 / 5; border-radius:0; }
+.wedding-edition #invitation-rsvp form { padding:22px; background:#ffffff6a; border:1px solid color-mix(in srgb,var(--wedding-motif),transparent 65%); }
 @media(max-width:650px) {
-  .wedding-split .wedding-hero, .wedding-split #invitation-events { grid-template-columns:1fr; }
-  .wedding-split .wedding-hero img { min-height:0; height:250px; }
+  .wedding-split .wedding-hero, .wedding-split .wedding-schedule { grid-template-columns:1fr; }
+  .wedding-split .wedding-hero img { min-height:0; height:clamp(235px,75vw,355px); }
+  .wedding-split.coastal .wedding-hero img,.wedding-split.coastal .wedding-cover-copy { grid-column:auto; grid-row:auto; }
+  .wedding-edition .gallery { gap:6px; }
 }
 
-.invitation[hidden] { display: none; }
+.invitation[hidden] { display:none; }
 .envelope-opening {
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 20px;
-  min-height: min(690px, 80svh);
-  padding: 36px 16px;
-  text-align: center;
-  background: radial-gradient(ellipse at center, #fffaf0, #eee8da);
+  position:relative; isolation:isolate; overflow:hidden;
+  min-height:min(810px,calc(100svh - 55px));
+  display:grid; align-content:center; justify-items:center; gap:clamp(24px,5vh,45px);
+  padding:54px 15px 32px; text-align:center; color:#fff9e7; background:#3a3325;
 }
-.envelope-opening h1 {
-  max-width: 18ch;
-  margin: 0;
-  color: #39412b;
-  font: 500 clamp(1.8rem, 5vw, 3.7rem)/1.05 var(--serif);
-}
-.envelope-trigger { display: grid; justify-items: center; gap: 17px; border-radius: 5px; color: #39412b; background: transparent; }
+.envelope-scene { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:-2; }
+.envelope-opening::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,#191b14ce,#312b2295 50%,#201a12c9); backdrop-filter:blur(5px); }
+.envelope-opening h1 { z-index:1; max-width:24ch; margin:0; color:inherit; font:500 clamp(2rem,5.5vw,4rem)/1.04 var(--serif); text-wrap:balance; }
+.envelope-trigger { display:grid; justify-items:center; gap:28px; color:inherit; background:transparent; border-radius:6px; }
 .envelope-art {
-  position: relative;
-  display: block;
-  isolation: isolate;
-  perspective: 760px;
-  width: clamp(235px, 58vw, 420px);
-  aspect-ratio: 1.57;
-  margin-top: 20px;
-  filter: drop-shadow(0 13px 18px #40381b28);
+  position:relative; display:block; isolation:isolate; perspective:1050px;
+  width:clamp(254px,68vw,495px); aspect-ratio:1.56;
+  filter:drop-shadow(0 15px 21px #17150991);
 }
-.envelope-back, .envelope-pocket, .envelope-flap { position: absolute; inset: 0; border-radius: 5px; }
-.envelope-back { background: #4c5838; }
-.envelope-letter {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  inset: 8% 7% 8%;
-  padding: 8px;
-  border: 1px solid #bfb18d;
-  background: #fff9e7;
-  color: #38402a;
-  font: 500 clamp(1rem, 3.5vw, 2rem)/1.15 var(--serif);
-  overflow-wrap: anywhere;
+.envelope-back,.envelope-pocket,.envelope-flap { position:absolute; inset:0; border-radius:7px; }
+.envelope-back,.envelope-pocket,.envelope-flap {
+  background-image:linear-gradient(145deg,#8c8d4645,#191b1272),url("/images/wedding/olive-velvet-texture.webp");
+  background-size:cover; background-repeat:no-repeat;
 }
-.envelope-pocket {
-  background: linear-gradient(165deg, #6c754d, #4c5838);
-  clip-path: polygon(0 0, 50% 61%, 100% 0, 100% 100%, 0 100%);
-}
+.envelope-back { background-color:#4c512f; box-shadow:inset 0 0 28px #1518078c; }
+.envelope-pocket { z-index:3; clip-path:polygon(0 0,50% 66%,100% 0,100% 100%,0 100%); border:1px solid #b1a17566; box-shadow:inset 0 -10px 17px #1c1c1175; }
 .envelope-flap {
-  height: 65%;
-  background: linear-gradient(174deg, #849068, #535f3c);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  transform-origin: top center;
+  z-index:4; height:70%; clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top center; box-shadow:inset 0 1px 0 #e4d6a281;
+  filter:brightness(1.17) drop-shadow(0 6px 5px #231b14a9);
+}
+.envelope-letter {
+  position:absolute; z-index:2; inset:7% 7% 4%; display:grid; place-items:center; padding:12px;
+  color:#37412b; font:500 clamp(1.45rem,4.7vw,3rem)/1.05 var(--serif);
+  border:1px solid #b7ab84; outline:1px solid #a29569; outline-offset:-9px;
+  background:radial-gradient(ellipse at 31% 22%,#fff9e8,#e8dbc0);
+  text-wrap:balance; overflow-wrap:anywhere; box-shadow:0 7px 14px #261c1552;
 }
 .envelope-seal {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  left: 50%;
-  top: 60%;
-  transform: translate(-50%, -50%);
-  width: clamp(42px, 11vw, 60px);
-  aspect-ratio: 1;
-  border: 3px ridge #b88051;
-  border-radius: 48% 51% 47% 53%;
-  color: #fff3cf;
-  background: radial-gradient(circle at 38% 30%, #975e3d, #66361f);
-  font: 700 .78rem var(--serif);
+  z-index:5; position:absolute; left:50%; top:67%; display:grid; place-items:center;
+  transform:translate(-50%,-50%); width:clamp(51px,12vw,72px); aspect-ratio:1;
+  color:#ffefc4; font:700 .9rem var(--serif); border:3px ridge #b9865e;
+  border-radius:46% 49% 45% 51%; box-shadow:0 5px 10px #20120ddb,inset 0 0 0 2px #5f3828;
+  background:radial-gradient(circle at 31% 25%,#b88059,#66391f 76%);
 }
-.envelope-action { border-radius: 100px; padding: 9px 22px; color: #fffbef; background: #4b573b; font-weight: 700; }
-.envelope-trigger[data-opening="true"] .envelope-seal { opacity: 0; transition: opacity .2s ease; }
-.envelope-trigger[data-opening="true"] .envelope-flap { transform: rotateX(180deg); transition: transform .5s .1s ease-in-out; }
-.envelope-trigger[data-opening="true"] .envelope-letter { animation: invitation-letter-rise .66s .37s cubic-bezier(.2,.7,.2,1) both; }
-@keyframes invitation-letter-rise {
-  from { transform: translateY(0); }
-  75%, to { transform: translateY(-68%); }
-}
+.envelope-action { border:1px solid #ede2bf; border-radius:3px; padding:10px 21px; background:#fff7df; color:#393c27; font-weight:700; }
+.envelope-trigger:hover .envelope-action { background:#eadcba; }
+.envelope-trigger[data-opening="true"] .envelope-seal { animation:invitation-seal-lift .27s ease-in both; }
+.envelope-trigger[data-opening="true"] .envelope-flap { animation:invitation-flap-fold .54s .19s ease-in-out both; }
+.envelope-trigger[data-opening="true"] .envelope-letter { animation:invitation-letter-rise .85s .63s cubic-bezier(.19,.75,.23,1) both; }
+@keyframes invitation-seal-lift { to { opacity:0; transform:translate(-50%,-62%) rotate(-15deg) scale(1.12); } }
+@keyframes invitation-flap-fold { 0% { transform:rotateX(0); } 49% { z-index:4; } 50%,100% { z-index:1; } 100% { transform:rotateX(178deg); } }
+@keyframes invitation-letter-rise { from { transform:translateY(0); } 65% { transform:translateY(-75%); } to { transform:translateY(-82%); } }

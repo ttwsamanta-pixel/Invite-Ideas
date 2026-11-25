@@ -53,7 +53,7 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
   const eventDate = ceremony && normalizeDate(formatDate.formatRange(new Date(ceremony.startsAt), new Date(invitation.finalEventAt)))
   const detailHeading = { en: 'Guest information', bn: 'অতিথিদের জন্য তথ্য', hi: 'मेहमानों के लिए जानकारी' }[invitation.language]
   return <>
-    {sealed && <EnvelopeOpening names={invitation.names} language={invitation.language} onOpen={() => setOpened(true)} />}
+    {sealed && <EnvelopeOpening names={invitation.names} language={invitation.language} artwork={config!.image} onOpen={() => setOpened(true)} />}
     <article hidden={sealed} className={'invitation ' + (config?.theme || '') + (config?.layout ? ' wedding-edition wedding-' + config.layout : '')} lang={invitation.language}>
     {config?.layout ? <>
       <header className="wedding-hero">
@@ -70,17 +70,17 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
       {invitation.id ? <span className="invite-flourish" aria-hidden="true">❦</span> : config?.image && <img src={config.image} alt="" />}
       <p>{t.invited}</p><h1 ref={headline} tabIndex={-1}>{invitation.names}</h1><p>{invitation.title}</p>
     </header>}
-    {sections.includes('countdown') && remaining !== undefined && remaining > 0 && <section className="invite-section"><strong>{new Intl.NumberFormat(invitation.language).format(remaining)} {t.remaining}</strong></section>}
-    {sections.includes('events') && <section className="invite-section" id="invitation-events"><h2>{t.events}</h2>{invitation.events.map((event, index) => <div key={index}>
-      <h3>{event.name}</h3><p>{normalizeDate(new Intl.DateTimeFormat(invitation.language, { dateStyle: 'full', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(event.startsAt)))}</p><p>{event.venue}</p>
+    {sections.includes('countdown') && remaining !== undefined && remaining > 0 && <section className="invite-section wedding-countdown"><strong>{new Intl.NumberFormat(invitation.language).format(remaining)}</strong><span>{t.remaining}</span></section>}
+    {sections.includes('events') && <section className="invite-section" id="invitation-events"><h2>{t.events}</h2><div className="wedding-schedule">{invitation.events.map((event, index) => <div className="wedding-event" key={index}>
+      <h3>{event.name}</h3><time dateTime={event.startsAt}>{normalizeDate(new Intl.DateTimeFormat(invitation.language, { dateStyle: 'full', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(event.startsAt)))}</time><p className="wedding-venue">{event.venue}</p>
       {event.description && <p>{event.description}</p>}{event.mapUrl && <a className="button outline small" href={event.mapUrl} target="_blank" rel="noreferrer">{t.map}</a>}
-    </div>)}</section>}
+    </div>)}</div></section>}
     {guestDetails.length > 0 && <section className="invite-section wedding-details" id="guest-information"><h2>{detailHeading}</h2>
       <dl>{guestDetails.map(field => <div key={field.key}><dt>{field.label}</dt><dd>{invitation.details?.[field.key]}</dd></div>)}</dl>
     </section>}
     {sections.includes('gallery') && invitation.gallery.length > 0 && <section className="invite-section" id="invitation-gallery"><h2>{t.gallery}</h2><div className="gallery">{invitation.gallery.map(image => <img key={image.id} src={image.url} alt={t.gallery} loading="lazy" />)}</div></section>}
-    {sections.includes('story') && invitation.story && <section className="invite-section"><h2>{t.story}</h2><p>{invitation.story}</p></section>}
-    {sections.includes('family') && invitation.family && <section className="invite-section"><h2>{t.family}</h2><p>{invitation.family}</p></section>}
+    {sections.includes('story') && invitation.story && <section className="invite-section wedding-note"><h2>{t.story}</h2><p>{invitation.story}</p></section>}
+    {sections.includes('family') && invitation.family && <section className="invite-section wedding-note wedding-family"><h2>{t.family}</h2><p>{invitation.family}</p></section>}
     {sections.includes('music') && invitation.music && <section className="invite-section"><p>{invitation.music.name}</p><audio controls preload="none" src={invitation.music.file} /></section>}
     {sections.includes('rsvp') && invitation.rsvpEnabled && (slug || sample) && remaining !== undefined && remaining > 0 && <section className="invite-section" id="invitation-rsvp"><h2>{t.rsvp}</h2>
       {sample && <p>Try the sample RSVP. Responses are discarded.</p>}{answer ? <p role="status" className="success">{answer}</p> : <form className="stack" onSubmit={respond}>

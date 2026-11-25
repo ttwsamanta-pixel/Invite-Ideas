@@ -9,9 +9,10 @@ const copy = {
   hi: { title: 'आपके लिए विवाह का निमंत्रण', open: 'निमंत्रण खोलें' },
 }
 
-export function EnvelopeOpening({ names, language, onOpen }: {
+export function EnvelopeOpening({ names, language, artwork, onOpen }: {
   names: string
   language: Invitation['language']
+  artwork: string
   onOpen: () => void
 }) {
   const [opening, setOpening] = useState(false)
@@ -25,6 +26,7 @@ export function EnvelopeOpening({ names, language, onOpen }: {
   }
 
   return <section className="envelope-opening" lang={language}>
+    <img className="envelope-scene" src={artwork} alt="" fetchPriority="high" />
     <h1>{text.title}</h1>
     <button type="button" className="envelope-trigger" data-opening={opening} aria-label={text.open} aria-disabled={opening}
       onClick={() => { if (!opening) openEnvelope() }}>
