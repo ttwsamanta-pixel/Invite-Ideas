@@ -5,6 +5,11 @@ import { demoCatalog, serverApi, type Template } from '../../../../lib/data'
 export const metadata = { title: 'Template Preview', robots: { index: false, follow: true } }
 
 const sampleStories: Record<string, string> = {
+  'lifafa-e-ishq': 'Our first conversation turned into years of letters. We wanted the invitation to feel like one more letter, this time to everyone we love.',
+  'royal-palace-gates': 'We chose a courtyard wedding so both families could spend an evening together under the Jaipur sky.',
+  'phoolon-ki-baraat': 'The first thing we agreed on was flowers everywhere. The second was that everyone should dance.',
+  'sheesh-mahal': 'Some of our favourite evenings end with our friends still at the table. We hope our wedding night feels just like that.',
+  'rajwadi-parchment': 'We are bringing our families together in Udaipur, where our grandparents first met.',
   'phulkari-courtyard': 'Our families first met over chai in Chandigarh. We are returning to the city to celebrate together after our Anand Karaj.',
   'jasmine-zari': 'Chennai is where we met, where our families first shared a meal, and where we will begin our married life.',
   'moonlit-jali': 'We spent our first evening together walking through Hyderabad. We wanted our wedding weekend to feel as warm and unhurried as that evening.',

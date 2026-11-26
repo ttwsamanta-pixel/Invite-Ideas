@@ -1,13 +1,16 @@
 import { Body, Controller, Get, Post, UseGuards, Req, Param, Patch, Query, BadRequestException } from '@nestjs/common'
+import { mkdir, writeFile, unlink } from 'node:fs/promises'
+import { join } from 'node:path'
+import sharp from 'sharp'
 import { z } from 'zod'
 import { AdminGuard, AuthGuard, AuthService, Mail, type AuthRequest } from './auth'
-import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddingLayout, weddingTheme } from './core'
+import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddingLayout, weddingTheme, storage, token } from './core'
 import { Invitations } from './invitations'
 
 const imagePath = z.string().regex(/^\/images\/(?:wedding\/)?[a-z0-9-]+\.webp$/)
-const configSchema = z.object({ editorLabels: z.object({ name: short.optional(), story: short.optional(), family: short.optional() }).optional(), theme: weddingTheme, layout: weddingLayout.optional(), componentKey: z.string().regex(/^[A-Za-z][A-Za-z0-9-]{0,79}$/).optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const configSchema = z.object({ editorLabels: z.object({ name: short.optional(), story: short.optional(), family: short.optional() }).optional(), theme: weddingTheme, layout: weddingLayout.optional(), componentKey: z.string().regex(/^[A-Za-z][A-Za-z0-9-]{0,79}$/).optional(), opening: z.union([z.literal('envelope'), z.object({ type: z.enum(['envelope', 'royal-gate', 'floral-curtain', 'mirror-reveal', 'parchment']), duration: z.number().int().min(1000).max(15000) })]).optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
 const metadata = z.object({
-  name: short, description: note, image: imagePath, style: short, categoryId: slug,
+  name: short, description: note, image: z.union([imagePath, z.string().regex(/^\/api\/template-thumbnails\/[a-f0-9]{64}\.webp$/)]), style: short, categoryId: slug,
   classification: z.enum(['Basic', 'Standard', 'Premium', 'Luxury']),
   culture: short.nullable().optional(), subcategory: short.nullable().optional(),
   sortOrder: z.number().int().min(0).max(9999).optional(),
@@ -157,6 +160,30 @@ export class AdminController {
       this.db.template.update({ where: { slug: id }, data: { ...fields, ...(status ? { active: status === 'PUBLISHED', archivedAt: status === 'ARCHIVED' ? new Date() : null } : fields.active === true ? { archivedAt: null } : {}) } }),
       this.db.activityLog.create({ data: audit(req.account.id, 'TEMPLATE_UPDATED', id) }),
     ])
+  }
+
+  @Post('templates/:slug/thumbnail')
+  async uploadThumbnail(@Req() req: AuthRequest, @Param('slug') id: string, @Body() raw: unknown) {
+    const input = validate(z.object({ data: z.string().max(6_666_668).regex(/^[A-Za-z0-9+/]+={0,2}$/) }), raw)
+    const buffer = Buffer.from(input.data, 'base64')
+    if (buffer.length > 5_000_000) throw new BadRequestException('Choose an image under 5 MB.')
+    const image = sharp(buffer, { limitInputPixels: 25_000_000 })
+    const metadata = await image.metadata().catch(() => null)
+    if (!metadata?.format || !['jpeg', 'png', 'webp'].includes(metadata.format) || (metadata.pages || 1) > 1) {
+      throw new BadRequestException('Choose a valid JPEG, PNG or WebP thumbnail.')
+    }
+    const thumbnail = await image.rotate().resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 }).toBuffer().catch(() => { throw new BadRequestException('The thumbnail could not be decoded.') })
+    const file = token() + '.webp'
+    const directory = join(storage(), 'template-thumbnails')
+    const destination = join(directory, file)
+    const url = '/api/template-thumbnails/' + file
+    await mkdir(directory, { recursive: true })
+    await writeFile(destination, thumbnail, { flag: 'wx' })
+    return this.db.$transaction([
+      this.db.template.update({ where: { slug: id }, data: { image: url }, select: { image: true } }),
+      this.db.activityLog.create({ data: audit(req.account.id, 'TEMPLATE_THUMBNAIL_UPDATED', id) }),
+    ]).catch(async error => { await unlink(destination).catch(() => undefined); throw error })
   }
 
   @Get('templates')

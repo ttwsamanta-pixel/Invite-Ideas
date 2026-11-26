@@ -209,6 +209,12 @@ export class InvitationsController {
     }).catch(async error => { await unlink(join(directory, file)).catch(() => undefined); throw error })
   }
 
+  @Get('template-thumbnails/:file')
+  templateThumbnail(@Param('file') file: string, @Res() res: Response) {
+    if (!/^[a-f0-9]{64}\.webp$/.test(file)) throw new NotFoundException()
+    res.type('webp').sendFile(join(storage(), 'template-thumbnails', file), { maxAge: '1y', immutable: true })
+  }
+
   @Get('public/media/:id')
   async publicMedia(@Req() req: Request, @Param('id') id: string, @Res() res: Response) {
     const asset = await this.db.mediaAsset.findUnique({ where: { id }, include: { invitation: { select: { status: true, ownerId: true } } } })

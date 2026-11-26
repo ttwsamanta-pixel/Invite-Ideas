@@ -6,6 +6,7 @@ import templateBatch from '../../../template-batch-01.json'
 import batchTwo from '../../../template-batch-02.json'
 import batchThree from '../../../template-batch-03.json'
 import batchFour from '../../../template-batch-04.json'
+import batchFive from '../../../template-batch-05.json'
 
 const db = new Db()
 async function seed() {
@@ -73,7 +74,7 @@ async function seed() {
       }
     })
   }
-  for (const design of [...batchThree, ...batchFour]) {
+  for (const design of [...batchThree, ...batchFour, ...batchFive]) {
     await db.template.upsert({
       where: { slug: design.id }, update: {},
       create: {

@@ -2,7 +2,8 @@
 import './wedding-editions.css'
 import Link from 'next/link'
 import Script from 'next/script'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { CinematicOpening } from './cinematic-opening'
 import { EnvelopeOpening } from './envelope-opening'
 import { resolveTemplate } from '../templates'
 import { toTemplateData } from '../templates/adapter'
@@ -21,9 +22,11 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
   const config = invitation.config
   const sections = config?.sections || []
   const [opened, setOpened] = useState(false)
+  const completeOpening = useCallback(() => setOpened(true), [])
+  const revealed = useRef<HTMLDivElement>(null)
   const headline = useRef<HTMLHeadingElement>(null)
   const sealed = config?.opening === 'envelope' && !opened
-  useEffect(() => { if (opened) headline.current?.focus() }, [opened])
+  useEffect(() => { if (opened) (revealed.current ?? headline.current)?.focus() }, [opened])
   const [remaining, setRemaining] = useState<number>()
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState('')
@@ -68,7 +71,12 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
       console.error('Unknown InviteIdeas invitation component', config.componentKey)
       return <section className="wrap content"><h1>Invitation unavailable</h1><p>Please contact the invitation host or try again later.</p><Link href="/">InviteIdeas home</Link></section>
     }
-    return <div className="batch-render" lang={invitation.language}><Template data={toTemplateData(invitation, rsvp)} /></div>
+    const content = <div className="batch-render" lang={invitation.language}><Template data={toTemplateData(invitation, rsvp)} /></div>
+    if (typeof config.opening !== 'object') return content
+    return <>
+      {!opened && <CinematicOpening opening={config.opening} names={invitation.names} title={invitation.title} language={invitation.language} onComplete={completeOpening} />}
+      {opened && <div ref={revealed} tabIndex={-1}>{content}</div>}
+    </>
   }
   return <>
     {sealed && <EnvelopeOpening names={invitation.names} language={invitation.language} artwork={config!.image} onOpen={() => setOpened(true)} />}

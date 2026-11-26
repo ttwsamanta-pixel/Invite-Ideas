@@ -1,0 +1,257 @@
+[
+  {
+    "id": "lifafa-e-ishq",
+    "name": "Lifafa-e-Ishq",
+    "category": "wedding",
+    "style": "Luxury",
+    "tier": "Luxury",
+    "opening": {
+      "type": "envelope",
+      "duration": 4400
+    },
+    "component": "LifafaEIshq",
+    "offerPrice": 229900,
+    "regularPrice": 279900,
+    "config": {
+      "componentKey": "LifafaEIshq",
+      "theme": "ruby",
+      "image": "/images/lifafa-e-ishq.webp",
+      "names": "Aanya & Dev",
+      "language": "en",
+      "opening": {
+        "type": "envelope",
+        "duration": 4400
+      },
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "Welcome from the couple"
+      },
+      "events": [
+        "Mehendi",
+        "Wedding Ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest information",
+          "example": "Please arrive 20 minutes before the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "royal-palace-gates",
+    "name": "Royal Palace Gates",
+    "category": "wedding",
+    "style": "Royal",
+    "tier": "Luxury",
+    "opening": {
+      "type": "royal-gate",
+      "duration": 4300
+    },
+    "component": "RoyalPalaceGates",
+    "offerPrice": 259900,
+    "regularPrice": 309900,
+    "config": {
+      "componentKey": "RoyalPalaceGates",
+      "theme": "plum",
+      "image": "/images/royal-palace-gates.webp",
+      "names": "Tara & Arjun",
+      "language": "en",
+      "opening": {
+        "type": "royal-gate",
+        "duration": 4300
+      },
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "Welcome from the couple"
+      },
+      "events": [
+        "Sangeet",
+        "Wedding Ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest information",
+          "example": "Please arrive 20 minutes before the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "phoolon-ki-baraat",
+    "name": "Phoolon Ki Baraat",
+    "category": "wedding",
+    "style": "Floral",
+    "tier": "Premium",
+    "opening": {
+      "type": "floral-curtain",
+      "duration": 3900
+    },
+    "component": "PhoolonKiBaraat",
+    "offerPrice": 189900,
+    "regularPrice": 239900,
+    "config": {
+      "componentKey": "PhoolonKiBaraat",
+      "theme": "rose",
+      "image": "/images/phoolon-ki-baraat.webp",
+      "names": "Mira & Kabir",
+      "language": "en",
+      "opening": {
+        "type": "floral-curtain",
+        "duration": 3900
+      },
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "Welcome from the couple"
+      },
+      "events": [
+        "Haldi",
+        "Wedding Ceremony",
+        "Dinner"
+      ],
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest information",
+          "example": "Please arrive 20 minutes before the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "sheesh-mahal",
+    "name": "Sheesh Mahal",
+    "category": "wedding",
+    "style": "Mirror",
+    "tier": "Luxury",
+    "opening": {
+      "type": "mirror-reveal",
+      "duration": 4200
+    },
+    "component": "SheeshMahal",
+    "offerPrice": 269900,
+    "regularPrice": 319900,
+    "config": {
+      "componentKey": "SheeshMahal",
+      "theme": "night",
+      "image": "/images/sheesh-mahal.webp",
+      "names": "Ira & Rohan",
+      "language": "en",
+      "opening": {
+        "type": "mirror-reveal",
+        "duration": 4200
+      },
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "Welcome from the couple"
+      },
+      "events": [
+        "Cocktail Evening",
+        "Wedding Ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest information",
+          "example": "Please arrive 20 minutes before the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "rajwadi-parchment",
+    "name": "Rajwadi Parchment",
+    "category": "wedding",
+    "style": "Heritage",
+    "tier": "Luxury",
+    "opening": {
+      "type": "parchment",
+      "duration": 4100
+    },
+    "component": "RajwadiParchment",
+    "offerPrice": 239900,
+    "regularPrice": 289900,
+    "config": {
+      "componentKey": "RajwadiParchment",
+      "theme": "ochre",
+      "image": "/images/rajwadi-parchment.webp",
+      "names": "Avni & Veer",
+      "language": "en",
+      "opening": {
+        "type": "parchment",
+        "duration": 4100
+      },
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "Welcome from the couple"
+      },
+      "events": [
+        "Welcome Dinner",
+        "Wedding Ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest information",
+          "example": "Please arrive 20 minutes before the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  }
+]
