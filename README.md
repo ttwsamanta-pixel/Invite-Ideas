@@ -95,3 +95,7 @@ The five React designs and scoped styles live in `apps/web/templates`. The versi
 ## Uploaded template batch 03
 
 `template-batch-03.json` seeds five occasion templates through the existing catalog and versioned invitation renderer. The uploaded components and scoped CSS are in `apps/web/templates`. Each design has sample copy in its catalog record for the sample preview; customer invitations use saved invitation data. The batch adds the Engagement / Roka category and records creation timestamps for new templates. Existing templates with unknown original creation dates retain a blank date in Admin.
+
+## Uploaded template batch 04
+
+`template-batch-04.json` seeds five templates and their supplied prices, converted from INR to paise. The only new category is Festive. Christian Garden is filed under Wedding with Christian culture metadata. The uploaded designs reuse the existing invitation adapter, event timeline, gallery, music button, scroll reveal, and RSVP form. Run `npm run db:seed` to add the batch to an existing database.

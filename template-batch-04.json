@@ -1,0 +1,219 @@
+[
+  {
+    "id": "durga-puja-divine",
+    "name": "Durga Puja Divine",
+    "category": "puja",
+    "componentKey": "DurgaPujaDivine",
+    "tier": "Premium",
+    "regularPrice": 499900,
+    "offerPrice": 299900,
+    "style": "Traditional",
+    "config": {
+      "theme": "scarlet",
+      "componentKey": "DurgaPujaDivine",
+      "image": "/images/durga-puja-divine.webp",
+      "names": "The Sen family",
+      "language": "bn",
+      "events": [
+        "Bodhan",
+        "Pushpanjali",
+        "Sandhi Puja"
+      ],
+      "editorLabels": {
+        "name": "Host or family name",
+        "story": "Puja message",
+        "family": "Family welcome"
+      },
+      "fields": [
+        {
+          "key": "ritual-note",
+          "label": "Ritual or guest instructions",
+          "example": "Please gather at the pandal before Pushpanjali."
+        }
+      ],
+      "sections": [
+        "events",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "naamkaran-lotus",
+    "name": "Naamkaran Lotus",
+    "category": "naming-ceremony",
+    "componentKey": "NaamkaranLotus",
+    "tier": "Premium",
+    "regularPrice": 399900,
+    "offerPrice": 249900,
+    "style": "Floral",
+    "config": {
+      "theme": "rose",
+      "componentKey": "NaamkaranLotus",
+      "image": "/images/naamkaran-lotus.webp",
+      "names": "Ira",
+      "language": "en",
+      "events": [
+        "Naamkaran Ceremony",
+        "Family Lunch"
+      ],
+      "editorLabels": {
+        "name": "Baby name",
+        "story": "Naming ceremony message",
+        "family": "Parents or family"
+      },
+      "fields": [
+        {
+          "key": "family-name",
+          "label": "Parents or family name",
+          "example": "The Roy family"
+        },
+        {
+          "key": "blessings-note",
+          "label": "Blessings or guest note",
+          "example": "You are welcome to bring a handwritten blessing."
+        }
+      ],
+      "sections": [
+        "events",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "annaprashan-heritage",
+    "name": "Annaprashan Heritage",
+    "category": "annaprashan",
+    "componentKey": "AnnaprashanHeritage",
+    "tier": "Premium",
+    "regularPrice": 399900,
+    "offerPrice": 249900,
+    "style": "Heritage",
+    "config": {
+      "theme": "marigold",
+      "componentKey": "AnnaprashanHeritage",
+      "image": "/images/annaprashan-heritage.webp",
+      "names": "Aarav",
+      "language": "bn",
+      "events": [
+        "First Rice Ceremony",
+        "Family Lunch"
+      ],
+      "editorLabels": {
+        "name": "Child name",
+        "story": "First rice ceremony message",
+        "family": "Parents or family"
+      },
+      "fields": [
+        {
+          "key": "family-name",
+          "label": "Parents or family name",
+          "example": "The Roy family"
+        },
+        {
+          "key": "ritual-note",
+          "label": "First rice ceremony instructions",
+          "example": "Please join us near the family table for the first bite."
+        }
+      ],
+      "sections": [
+        "events",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "christian-garden-wedding",
+    "name": "Christian Garden",
+    "category": "wedding",
+    "culture": "christian",
+    "componentKey": "ChristianGardenWedding",
+    "tier": "Luxury",
+    "regularPrice": 699900,
+    "offerPrice": 449900,
+    "style": "Garden",
+    "config": {
+      "theme": "sage",
+      "componentKey": "ChristianGardenWedding",
+      "image": "/images/christian-garden-wedding.webp",
+      "names": "Elena & Daniel",
+      "language": "en",
+      "events": [
+        "Church Ceremony",
+        "Garden Reception"
+      ],
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Wedding story",
+        "family": "Welcome from the couple"
+      },
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Ceremony and reception guidance",
+          "example": "Please arrive at the church 15 minutes before the service."
+        }
+      ],
+      "sections": [
+        "events",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "diwali-lights",
+    "name": "Diwali Lights",
+    "category": "festive",
+    "componentKey": "DiwaliLights",
+    "tier": "Premium",
+    "regularPrice": 349900,
+    "offerPrice": 199900,
+    "style": "Festive",
+    "config": {
+      "theme": "night",
+      "componentKey": "DiwaliLights",
+      "image": "/images/diwali-lights.webp",
+      "names": "The Mehta family",
+      "language": "en",
+      "events": [
+        "Lakshmi Puja",
+        "Dinner"
+      ],
+      "editorLabels": {
+        "name": "Host or family name",
+        "story": "Diwali message",
+        "family": "Family welcome"
+      },
+      "fields": [
+        {
+          "key": "guest-note",
+          "label": "Guest or arrival instructions",
+          "example": "Please enter through the illuminated garden gate."
+        }
+      ],
+      "sections": [
+        "events",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  }
+]

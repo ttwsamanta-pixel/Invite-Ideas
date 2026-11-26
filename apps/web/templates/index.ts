@@ -18,6 +18,11 @@ export const INVITE_IDEAS_TEMPLATE_REGISTRY = {
   LittleWonder: dynamic(() => import('./LittleWonder')),
   ShubhGriha: dynamic(() => import('./ShubhGriha')),
   ForeverUs: dynamic(() => import('./ForeverUs')),
+  DurgaPujaDivine: dynamic(() => import('./DurgaPujaDivine')),
+  NaamkaranLotus: dynamic(() => import('./NaamkaranLotus')),
+  AnnaprashanHeritage: dynamic(() => import('./AnnaprashanHeritage')),
+  ChristianGardenWedding: dynamic(() => import('./ChristianGardenWedding')),
+  DiwaliLights: dynamic(() => import('./DiwaliLights')),
 } as const
 
 export function resolveTemplate(key: string) {

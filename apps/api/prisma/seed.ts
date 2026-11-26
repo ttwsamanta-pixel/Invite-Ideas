@@ -5,6 +5,7 @@ import weddingCollection from '../../../wedding-collection.json'
 import templateBatch from '../../../template-batch-01.json'
 import batchTwo from '../../../template-batch-02.json'
 import batchThree from '../../../template-batch-03.json'
+import batchFour from '../../../template-batch-04.json'
 
 const db = new Db()
 async function seed() {
@@ -72,11 +73,11 @@ async function seed() {
       }
     })
   }
-  for (const design of batchThree) {
+  for (const design of [...batchThree, ...batchFour]) {
     await db.template.upsert({
       where: { slug: design.id }, update: {},
       create: {
-        slug: design.id, name: design.name, categoryId: design.category, style: design.style, classification: design.tier,
+        slug: design.id, name: design.name, categoryId: design.category, style: design.style, classification: design.tier, culture: "culture" in design ? design.culture : undefined,
         image: design.config.image, description: design.name + ' invitation with an event schedule, photo gallery and RSVP.',
         regularPrice: design.regularPrice, offerPrice: design.offerPrice,
         versions: { create: { number: 1, config: design.config } },
