@@ -34,7 +34,7 @@ export class Payments {
         if (promo && invitation.order.couponCode !== promo) throw new ConflictException('This order already has a fixed checkout amount.')
         return invitation.order
       }
-      const updated = await tx.invitation.updateMany({ where: { id, status: 'DRAFT', finalEventAt: { gt: new Date() } }, data: { status: 'PAYMENT_PENDING' } })
+      const updated = await tx.invitation.updateMany({ where: { id, status: 'DRAFT', events: { some: {} }, finalEventAt: { gt: new Date() } }, data: { status: 'PAYMENT_PENDING' } })
       if (!updated.count) throw new ConflictException('This invitation is no longer available for checkout.')
       const { regularPrice, offerPrice } = invitation.templateVersion.template
       let discount = 0

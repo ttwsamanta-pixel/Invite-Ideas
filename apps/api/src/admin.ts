@@ -5,7 +5,13 @@ import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddin
 import { Invitations } from './invitations'
 
 const imagePath = z.string().regex(/^\/images\/(?:wedding\/)?[a-z0-9-]+\.webp$/)
-const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), componentKey: z.string().regex(/^[A-Za-z][A-Za-z0-9]{0,79}$/).optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const metadata = z.object({
+  name: short, description: note, image: imagePath, style: short, categoryId: slug,
+  classification: z.enum(['Basic', 'Standard', 'Premium', 'Luxury']),
+  culture: short.nullable().optional(), subcategory: short.nullable().optional(),
+  sortOrder: z.number().int().min(0).max(9999).optional(),
+})
 const priceSchema = z.object({
   regularPrice: z.number().int().min(100).max(10_000_000),
   offerPrice: z.number().int().min(100).max(10_000_000),
@@ -131,9 +137,8 @@ export class AdminController {
 
   @Post('templates')
   createTemplate(@Req() req: AuthRequest, @Body() raw: unknown) {
-    const data = validate(z.object({
-      slug, name: short, description: note, image: imagePath, style: short, categoryId: slug,
-      classification: z.enum(['Basic', 'Standard', 'Premium', 'Luxury']), badge: short.optional(),
+    const data = validate(metadata.extend({
+      slug, badge: short.optional(),
       regularPrice: z.number(), offerPrice: z.number(), config: configSchema,
     }), raw)
     validate(priceSchema, data)
@@ -146,10 +151,10 @@ export class AdminController {
 
   @Patch('templates/:slug')
   updateTemplate(@Req() req: AuthRequest, @Param('slug') id: string, @Body() raw: unknown) {
-    const fields = validate(z.object({ regularPrice: z.number(), offerPrice: z.number(), featured: z.boolean(), active: z.boolean() }), raw)
+    const { status, ...fields } = validate(metadata.partial().extend({ regularPrice: z.number(), offerPrice: z.number(), featured: z.boolean(), active: z.boolean().optional(), status: z.enum(['PUBLISHED', 'UNPUBLISHED', 'ARCHIVED']).optional() }), raw)
     validate(priceSchema, fields)
     return this.db.$transaction([
-      this.db.template.update({ where: { slug: id }, data: fields }),
+      this.db.template.update({ where: { slug: id }, data: { ...fields, ...(status ? { active: status === 'PUBLISHED', archivedAt: status === 'ARCHIVED' ? new Date() : null } : fields.active === true ? { archivedAt: null } : {}) } }),
       this.db.activityLog.create({ data: audit(req.account.id, 'TEMPLATE_UPDATED', id) }),
     ])
   }

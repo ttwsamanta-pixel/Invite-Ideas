@@ -1,0 +1,212 @@
+[
+  {
+    "id": "royal-indian-wedding",
+    "name": "Royal Indian Wedding",
+    "category": "wedding",
+    "style": "royal",
+    "tier": "LUXURY",
+    "regularPrice": 149900,
+    "offerPrice": 99900,
+    "status": "PUBLISHED",
+    "componentKey": "RoyalIndianWedding",
+    "config": {
+      "componentKey": "RoyalIndianWedding",
+      "theme": "plum",
+      "image": "/images/wedding/amber-jharokha.webp",
+      "names": "Royal Indian Wedding",
+      "language": "en",
+      "events": [
+        "Mehendi",
+        "Sangeet",
+        "Saat Phere",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "bengali-heritage-wedding",
+    "name": "Bengali Heritage Wedding",
+    "category": "bengali-wedding",
+    "style": "bengali-traditional",
+    "tier": "PREMIUM",
+    "regularPrice": 129900,
+    "offerPrice": 89900,
+    "status": "PUBLISHED",
+    "componentKey": "BengaliHeritageWedding",
+    "config": {
+      "componentKey": "BengaliHeritageWedding",
+      "theme": "scarlet",
+      "image": "/images/wedding/alpana-silk.webp",
+      "names": "Bengali Heritage Wedding",
+      "language": "bn",
+      "events": [
+        "????? ????",
+        "??? ?????",
+        "?????"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "sikh-royal-wedding",
+    "name": "Sikh Royal Wedding",
+    "category": "sikh-wedding",
+    "style": "sikh-royal",
+    "tier": "PREMIUM",
+    "regularPrice": 139900,
+    "offerPrice": 89900,
+    "status": "PUBLISHED",
+    "componentKey": "SikhRoyalWedding",
+    "config": {
+      "componentKey": "SikhRoyalWedding",
+      "theme": "teal",
+      "image": "/images/wedding/phulkari-courtyard.webp",
+      "names": "Sikh Royal Wedding",
+      "language": "en",
+      "events": [
+        "Milni",
+        "Anand Karaj",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "muslim-nikah-luxury",
+    "name": "Muslim Nikah Luxury",
+    "category": "nikah-wedding",
+    "style": "nikah-luxury",
+    "tier": "PREMIUM",
+    "regularPrice": 149900,
+    "offerPrice": 99900,
+    "status": "PUBLISHED",
+    "componentKey": "MuslimNikahLuxury",
+    "config": {
+      "componentKey": "MuslimNikahLuxury",
+      "theme": "midnight",
+      "image": "/images/wedding/moonlit-jali.webp",
+      "names": "Muslim Nikah Luxury",
+      "language": "en",
+      "events": [
+        "Mehndi",
+        "Nikah",
+        "Walima"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "modern-editorial-wedding",
+    "name": "Modern Editorial Wedding",
+    "category": "wedding",
+    "style": "editorial",
+    "tier": "LUXURY",
+    "regularPrice": 159900,
+    "offerPrice": 109900,
+    "status": "PUBLISHED",
+    "componentKey": "ModernEditorialWedding",
+    "config": {
+      "componentKey": "ModernEditorialWedding",
+      "theme": "coastal",
+      "image": "/images/wedding/salt-and-sunset.webp",
+      "names": "Modern Editorial Wedding",
+      "language": "en",
+      "events": [
+        "Wedding ceremony",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  }
+]

@@ -1,11 +1,11 @@
 import catalog from '../../../catalog.json'
 import weddingCollection from '../../../wedding-collection.json'
 
-export type Config = { theme: string; names: string; image: string; sections: string[]; layout?: 'frame' | 'split' | 'cover'; opening?: 'envelope'; language?: 'en' | 'bn' | 'hi'; place?: string; events?: string[]; fields?: { key: string; label: string; example?: string }[] }
+export type Config = { theme: string; names: string; image: string; sections: string[]; layout?: 'frame' | 'split' | 'cover'; opening?: 'envelope'; componentKey?: string; language?: 'en' | 'bn' | 'hi'; place?: string; events?: string[]; fields?: { key: string; label: string; example?: string }[] }
 export type Template = {
   slug: string; name: string; description: string; image: string; style: string; badge: string | null
   categoryId: string; category: { slug: string; name: string }; offerPrice: number; regularPrice: number
-  featured: boolean; active: boolean; classification: string; versions: { number: number; config: Config }[]
+  featured: boolean; active: boolean; classification: string; culture?: string | null; subcategory?: string | null; sortOrder?: number; archivedAt?: string | null; versions: { number: number; config: Config }[]
 }
 export const categories = catalog.categories.map(([slug, name]) => ({ slug, name }))
 export const demoCatalog: Template[] = catalog.templates.map(entry => {
@@ -34,7 +34,7 @@ export async function serverApi<T>(path: string): Promise<T | null> {
 export type InvitationEvent = { name: string; startsAt: string; venue: string; mapUrl?: string; description: string }
 export type Order = { status: string; method: string; amount: number; paymentLinkUrl?: string }
 export type Invitation = {
-  id: string; title: string; names: string; language: 'en' | 'bn' | 'hi'; timezone: string
+  id: string; templateId?: string; templateVersionNumber?: number; title: string; names: string; language: 'en' | 'bn' | 'hi'; timezone: string
   story: string; family: string; details?: Record<string, string> | null; finalEventAt: string; events: InvitationEvent[]; rsvpEnabled: boolean
   gallery: { id: string; url?: string }[]; musicId?: string | null; music?: { name: string; file: string } | null
   slug?: string; status?: string; checkoutPrice?: number; source?: string; previewToken?: string; order: Order | null

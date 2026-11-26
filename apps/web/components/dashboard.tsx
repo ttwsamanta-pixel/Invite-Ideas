@@ -66,7 +66,7 @@ export function Dashboard() {
     {items?.length === 0 && <div className="panel"><p>Your saved drafts and published invitations will appear here.</p><Link href="/templates">Explore invitation templates</Link></div>}
     {items?.map(invitation => <article className="panel list-card" key={invitation.id}>
       <span className="badge-static">{invitation.status?.replaceAll('_', ' ')}</span><h2>{invitation.title}</h2>
-      <p>{invitation.templateVersion?.template.name} · {new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(invitation.finalEventAt))}</p>
+      <p>{invitation.templateVersion?.template.name} · {invitation.events.length ? new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: invitation.timezone }).format(new Date(invitation.finalEventAt)) : 'Add event details'}</p>
       <p>{invitation._count?.views ?? 0} views · {invitation._count?.responses ?? 0} RSVPs {invitation.order && ' · ' + money(invitation.order.amount) + ' · ' + invitation.order.status}</p>
       <div className="inline">
         {['DRAFT', 'ACTIVE'].includes(invitation.status || '') && <Link className="button outline small" href={'/editor/' + invitation.templateVersion?.template.slug + '?edit=' + invitation.id}>Edit</Link>}

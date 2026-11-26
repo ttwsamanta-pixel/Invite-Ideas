@@ -2,6 +2,7 @@ import { Db } from '../src/database'
 import { hash } from 'argon2'
 import catalog from '../../../catalog.json'
 import weddingCollection from '../../../wedding-collection.json'
+import templateBatch from '../../../template-batch-01.json'
 
 const db = new Db()
 async function seed() {
@@ -27,6 +28,19 @@ async function seed() {
         slug: design.slug, name: design.name, categoryId: design.category, style: design.style,
         classification: design.tier, badge: design.tier, image: design.config.image,
         offerPrice: design.price, regularPrice: design.regular, description: design.description, featured: design.featured,
+        versions: { create: { number: 1, config: design.config } },
+      },
+    })
+  }
+  for (const design of templateBatch) {
+    await db.template.upsert({
+      where: { slug: design.id }, update: {},
+      create: {
+        slug: design.id, name: design.name, categoryId: design.category, style: design.style,
+        classification: design.tier[0] + design.tier.slice(1).toLowerCase(), image: design.config.image,
+        regularPrice: design.regularPrice, offerPrice: design.offerPrice,
+        description: design.name + ' invitation with ceremony schedule, gallery and RSVP.',
+        active: design.status === 'PUBLISHED',
         versions: { create: { number: 1, config: design.config } },
       },
     })

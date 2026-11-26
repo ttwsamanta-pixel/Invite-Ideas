@@ -4,8 +4,9 @@ import { InvitationView } from '../../../components/invitation'
 import { serverApi, type Invitation } from '../../../lib/data'
 const load = cache((slug: string) => serverApi<Invitation>('/public/invite/' + encodeURIComponent(slug)))
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const invitation = await load((await params).slug)
-  return { title: invitation?.title || 'Invitation', robots: { index: false, follow: false }, openGraph: { title: invitation?.title, description: invitation?.names, images: [invitation?.config?.image || '/images/social.png'] } }
+  const { slug } = await params
+  const invitation = await load(slug)
+  return { title: invitation?.title || 'Invitation', description: invitation?.names, alternates: invitation ? { canonical: '/invite/' + encodeURIComponent(slug) } : undefined, robots: { index: false, follow: false }, openGraph: { title: invitation?.title, description: invitation?.names, images: [invitation?.config?.image || '/images/social.png'] } }
 }
 export default async function PublicInvite({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

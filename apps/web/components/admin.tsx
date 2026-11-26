@@ -88,13 +88,23 @@ export function Admin() {
       {section === 'Templates' && <section className="panel stack"><h2>Manage templates</h2>
         {templates.map(template => <details key={template.slug} id={'aw-item-' + template.slug}><summary>{template.name} · {money(template.offerPrice)}</summary>
           <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/templates/' + template.slug, 'PATCH', {
-            regularPrice: Math.round(Number(fields.get('regular')) * 100), offerPrice: Math.round(Number(fields.get('offer')) * 100), featured: fields.get('featured') === 'on', active: fields.get('active') === 'on',
+            regularPrice: Math.round(Number(fields.get('regular')) * 100), offerPrice: Math.round(Number(fields.get('offer')) * 100), featured: fields.get('featured') === 'on', status: fields.get('status'),
+            name: fields.get('name'), image: fields.get('image'), style: fields.get('style'), categoryId: fields.get('category'), classification: fields.get('tier'),
+            culture: fields.get('culture') || null, subcategory: fields.get('subcategory') || null, sortOrder: Number(fields.get('sortOrder')),
           }), 'Template updated.') }}>
+            <label>Name<input name="name" defaultValue={template.name} required /></label>
+            <label>Style<input name="style" defaultValue={template.style} required /></label>
+            <label>Category slug<input name="category" defaultValue={template.categoryId} required /></label>
+            <label>Culture<input name="culture" defaultValue={template.culture || ''} /></label>
+            <label>Subcategory<input name="subcategory" defaultValue={template.subcategory || ''} /></label>
+            <label>Tier<select name="tier" defaultValue={template.classification}>{['Basic', 'Standard', 'Premium', 'Luxury'].map(tier => <option key={tier}>{tier}</option>)}</select></label>
+            <label>Thumbnail path<input name="image" defaultValue={template.image} required /></label>
+            <label>Sort order<input name="sortOrder" type="number" min="0" max="9999" defaultValue={template.sortOrder || 0} /></label>
             <label>Regular price (₹)<input name="regular" type="number" min="1" step="0.01" defaultValue={template.regularPrice / 100} required /></label><label>Offer price (₹)<input name="offer" type="number" min="1" step="0.01" defaultValue={template.offerPrice / 100} required /></label>
-            <label className="checkbox"><input type="checkbox" name="featured" defaultChecked={template.featured} /> Featured</label><label className="checkbox"><input type="checkbox" name="active" defaultChecked={template.active} /> Active</label><button className="button small" disabled={busy}>Save pricing</button>
+            <label className="checkbox"><input type="checkbox" name="featured" defaultChecked={template.featured} /> Featured</label><label>Status<select name="status" defaultValue={template.archivedAt ? 'ARCHIVED' : template.active ? 'PUBLISHED' : 'UNPUBLISHED'}><option value="PUBLISHED">Published</option><option value="UNPUBLISHED">Unpublished</option><option value="ARCHIVED">Archived</option></select></label><button className="button small" disabled={busy}>Save template</button>
           </form>
           <form className="stack" onSubmit={event => { const fields = form(event); void run(() => api('/admin/templates/' + template.slug + '/versions', 'POST', JSON.parse(String(fields.get('config')))), 'New template version published.') }}>
-            <label>Version configuration (JSON)<textarea name="config" required defaultValue={JSON.stringify(template.versions[0]?.config, null, 2)} /></label><button className="button small" disabled={busy}>Publish new version</button>
+            <Link href={'/preview/template/' + template.slug}>Open public template preview</Link><label>Version configuration (JSON)<textarea name="config" required defaultValue={JSON.stringify(template.versions[0]?.config, null, 2)} /></label><button className="button small" disabled={busy}>Publish new version</button>
           </form>
         </details>)}
         <details id="aw-add-template"><summary>Create a new template</summary><form className="stack" onSubmit={event => {

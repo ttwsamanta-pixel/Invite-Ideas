@@ -24,10 +24,22 @@ export class Invitations {
   async list(ownerId: string) {
     return (await this.db.invitation.findMany({ where: { ownerId }, take: 100, orderBy: { createdAt: 'desc' }, include })).map(item => this.present(item))
   }
+  async startDraft(raw: unknown, ownerId: string) {
+    const { template, requestId } = validate(z.object({ template: slug, requestId: z.uuid() }), raw)
+    const version = await this.db.templateVersion.findFirst({ where: { templateId: template, template: { active: true } }, include: { template: { select: { name: true } } }, orderBy: { number: 'desc' } })
+    if (!version) throw new NotFoundException('Template unavailable.')
+    const previewToken = digest(ownerId + ':' + template + ':' + requestId)
+    return this.db.invitation.upsert({
+      where: { previewToken }, update: {},
+      create: { ownerId, source: 'CUSTOMER', templateVersionId: version.id, previewToken, title: version.template.name, names: '', story: '', family: '', finalEventAt: new Date() },
+      include,
+    })
+  }
+
   async create(raw: unknown, ownerId: string, source: 'CUSTOMER' | 'ADMIN') {
     const input = validate(invitationBody.extend({ template: slug }), raw)
     const { template, events, details, ...fields } = input
-    const version = await this.db.templateVersion.findFirst({ where: { templateId: template, template: { active: true } }, orderBy: { number: 'desc' } })
+    const version = await this.db.templateVersion.findFirst({ where: { templateId: template, template: { active: true } }, include: { template: { select: { name: true } } }, orderBy: { number: 'desc' } })
     if (!version) throw new NotFoundException('Template unavailable.')
     const finalEventAt = finalEvent(events)
     if (finalEventAt <= new Date()) throw new BadRequestException('Enter a future final event date and time.')
@@ -36,14 +48,14 @@ export class Invitations {
   }
   async edit(id: string, account: Account, raw: unknown) {
     const current = await this.own(id, account)
-    assertEditable(current)
+    if (current.status !== 'DRAFT' || current.events.length) assertEditable(current)
     const { events, details, ...fields } = validate(invitationBody, raw)
     const finalEventAt = finalEvent(events)
     if (finalEventAt <= new Date()) throw new BadRequestException('Enter a future final event date and time.')
     if (fields.musicId !== current.musicId) await this.checkMusic(fields.musicId)
     return this.db.$transaction(async tx => {
       const result = await tx.invitation.updateMany({
-        where: { id, updatedAt: current.updatedAt, status: { in: ['DRAFT', 'ACTIVE'] }, finalEventAt: { gt: new Date() } },
+        where: { id, updatedAt: current.updatedAt, status: { in: ['DRAFT', 'ACTIVE'] }, OR: [{ finalEventAt: { gt: new Date() } }, { status: 'DRAFT', events: { none: {} } }] },
         data: { ...fields, ...(details === undefined ? {} : { details: selectWeddingDetails(current.templateVersion.config, details) }), finalEventAt },
       })
       if (!result.count) throw new ConflictException('The invitation changed. Reload and try again.')
@@ -62,7 +74,7 @@ export class Invitations {
   }
   publicFields(invitation: Awaited<ReturnType<Invitations['eventPage']>>) {
     const { title, names, language, timezone, story, family, details, rsvpEnabled, finalEventAt, events, gallery, music, templateVersion } = invitation
-    return { id: invitation.slug ? invitation.slug : invitation.id, title, names, language, timezone, story, family, details, rsvpEnabled, finalEventAt, events, gallery: gallery.map(asset => ({ id: asset.id, url: '/api/public/media/' + asset.id })), music: music ? { name: music.name, file: music.file } : null, config: templateVersion.config }
+    return { id: invitation.slug ? invitation.slug : invitation.id, templateId: templateVersion.templateId, templateVersionNumber: templateVersion.number, title, names, language, timezone, story, family, details, rsvpEnabled, finalEventAt, events, gallery: gallery.map(asset => ({ id: asset.id, url: '/api/public/media/' + asset.id })), music: music ? { name: music.name, file: music.file } : null, config: templateVersion.config }
   }
 }
 @Controller()
@@ -73,7 +85,7 @@ export class InvitationsController {
 
   @Get('templates')
   async templates() {
-    return this.db.template.findMany({ where: { active: true, versions: { some: {} } }, include: { category: true, versions: { orderBy: { number: 'desc' }, take: 1 } }, orderBy: [{ featured: 'desc' }, { name: 'asc' }] })
+    return this.db.template.findMany({ where: { active: true, versions: { some: {} } }, include: { category: true, versions: { orderBy: { number: 'desc' }, take: 1 } }, orderBy: [{ featured: 'desc' }, { sortOrder: 'asc' }, { name: 'asc' }] })
   }
   @Get('categories')
   categories() { return this.db.category.findMany({ orderBy: { name: 'asc' } }) }
@@ -88,6 +100,10 @@ export class InvitationsController {
   @UseGuards(AuthGuard)
   @Post('invitations')
   create(@Req() req: AuthRequest, @Body() raw: unknown) { return this.invitations.create(raw, req.account.id, 'CUSTOMER') }
+
+  @UseGuards(AuthGuard)
+  @Post('invitations/drafts')
+  startDraft(@Req() req: AuthRequest, @Body() raw: unknown) { return this.invitations.startDraft(raw, req.account.id) }
 
   @UseGuards(AuthGuard)
   @Get('invitations/:id')
@@ -173,7 +189,7 @@ export class InvitationsController {
   @Post('invitations/:id/gallery')
   async upload(@Req() req: AuthRequest, @Param('id') id: string, @Body() raw: unknown) {
     const current = await this.invitations.own(id, req.account)
-    assertEditable(current)
+    if (current.status !== 'DRAFT' || current.events.length) assertEditable(current)
     if (current.gallery.length >= 20) throw new ConflictException('The gallery supports up to 20 photos.')
     const input = validate(z.object({ data: z.string().max(7_000_000).regex(/^[A-Za-z0-9+/]+={0,2}$/), type: z.enum(['image/jpeg', 'image/png', 'image/webp']) }), raw)
     const buffer = Buffer.from(input.data, 'base64')
@@ -187,7 +203,7 @@ export class InvitationsController {
     await mkdir(directory, { recursive: true })
     await writeFile(join(directory, file), data, { flag: 'wx' })
     return this.db.$transaction(async tx => {
-      const changed = await tx.invitation.updateMany({ where: { id, updatedAt: current.updatedAt, finalEventAt: { gt: new Date() }, status: { in: ['DRAFT', 'ACTIVE'] } }, data: { updatedAt: new Date() } })
+      const changed = await tx.invitation.updateMany({ where: { id, updatedAt: current.updatedAt, OR: [{ finalEventAt: { gt: new Date() } }, { status: 'DRAFT', events: { none: {} } }], status: { in: ['DRAFT', 'ACTIVE'] } }, data: { updatedAt: new Date() } })
       if (!changed.count) throw new ConflictException('Reload the invitation before uploading.')
       return tx.mediaAsset.create({ data: { invitationId: id, file, width: info.width, height: info.height }, select: { id: true, width: true, height: true } })
     }).catch(async error => { await unlink(join(directory, file)).catch(() => undefined); throw error })

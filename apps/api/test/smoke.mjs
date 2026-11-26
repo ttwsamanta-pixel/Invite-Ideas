@@ -74,6 +74,25 @@ if (process.env.DATABASE_URL) {
   const { Db } = (await import('../dist/database.js')).default
   const { Mail } = (await import('../dist/auth.js')).default
   const { Payments } = (await import('../dist/payments.js')).default
+  const batchPayload = { ...payload, title: 'Batch Royal ' + suffix, names: 'Riya & Ajay', details: { 'groom-name': 'Ajay', 'bride-name': 'Riya' } }
+  const requestId = randomUUID()
+  const batchDraft = await request('/invitations/drafts', 'POST', { template: 'royal-indian-wedding', requestId }, 201)
+  assert.equal(batchDraft.slug, null)
+  assert.equal(batchDraft.events.length, 0)
+  assert.equal((await request('/invitations/drafts', 'POST', { template: 'royal-indian-wedding', requestId }, 201)).id, batchDraft.id)
+  const bengaliBatch = await request('/admin/invitations', 'POST', { ...payload, template: 'bengali-heritage-wedding', ownerId: customer.id }, 201)
+  await request('/invitations/' + batchDraft.id, 'PATCH', batchPayload)
+  const royalPreview = await request('/preview/' + batchDraft.previewToken)
+  assert.equal(royalPreview.templateId, 'royal-indian-wedding')
+  assert.equal(royalPreview.config.componentKey, 'RoyalIndianWedding')
+  assert.equal(royalPreview.details['groom-name'], 'Ajay')
+  const bengaliPreview = await request('/preview/' + bengaliBatch.previewToken)
+  assert.equal(bengaliPreview.config.componentKey, 'BengaliHeritageWedding')
+  assert.equal(bengaliPreview.names, payload.names)
+  const bengaliPublic = await request('/admin/invitations/' + bengaliBatch.id + '/offline-payment', 'POST', { type: 'UPI', reference: 'batch-' + suffix }, 201)
+  const publicBengali = await fetch(origin + '/invite/' + bengaliPublic.slug)
+  assert.equal(publicBengali.status, 200)
+  assert.match(await publicBengali.text(), /class="invite bengali"/)
   const db = new Db()
   try {
     const code = 'TEST-' + suffix.toUpperCase()
@@ -83,6 +102,17 @@ if (process.env.DATABASE_URL) {
     }, 201)
     const nextDraft = await request('/invitations', 'POST', payload, 201)
     const payments = new Payments(db, new Mail())
+    const royalOrder = await payments.prepare(batchDraft.id, 'ONLINE')
+    assert.equal(royalOrder.amount, 99900)
+    const batchGatewayOrder = await db.order.update({ where: { id: royalOrder.id }, data: { gatewayOrderId: 'order_batch' + suffix } })
+    const batchPaymentId = 'pay_batch' + suffix
+    payments.gateway = async () => ({ id: batchPaymentId, status: 'captured', order_id: batchGatewayOrder.gatewayOrderId, amount: royalOrder.amount, currency: 'INR' })
+    const batchPublished = await payments.confirmOnline(batchGatewayOrder, batchPaymentId)
+    const publicRoyal = await fetch(origin + '/invite/' + batchPublished.slug)
+    assert.equal(publicRoyal.status, 200)
+    assert.match(await publicRoyal.text(), /class="invite royal"/)
+    assert.equal((await request('/public/invite/' + batchPublished.slug, 'GET', undefined, 200, false)).templateVersionNumber, 1)
+
     const attempts = await Promise.allSettled([payments.prepare(draft.id, 'ONLINE', code), payments.prepare(nextDraft.id, 'ONLINE', code)])
     const claims = attempts.filter(result => result.status === 'fulfilled')
     assert.equal(claims.length, 1)

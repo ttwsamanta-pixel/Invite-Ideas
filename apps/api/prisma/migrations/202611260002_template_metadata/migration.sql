@@ -1,0 +1,5 @@
+ALTER TABLE `templates`
+    ADD COLUMN `culture` VARCHAR(191) NULL,
+    ADD COLUMN `subcategory` VARCHAR(191) NULL,
+    ADD COLUMN `sortOrder` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `archivedAt` DATETIME(3) NULL;

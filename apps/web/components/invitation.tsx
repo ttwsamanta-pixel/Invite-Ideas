@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Script from 'next/script'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { EnvelopeOpening } from './envelope-opening'
+import { resolveTemplate } from '../templates'
+import { toTemplateData } from '../templates/adapter'
 import { api } from '../lib/client'
 import { money, type Invitation } from '../lib/data'
 
@@ -52,6 +54,22 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
   const formatDate = new Intl.DateTimeFormat(invitation.language, { year: 'numeric', month: 'long', day: 'numeric', timeZone: invitation.timezone })
   const eventDate = ceremony && normalizeDate(formatDate.formatRange(new Date(ceremony.startsAt), new Date(invitation.finalEventAt)))
   const detailHeading = { en: 'Guest information', bn: 'অতিথিদের জন্য তথ্য', hi: 'मेहमानों के लिए जानकारी' }[invitation.language]
+  const rsvp = (sections.includes('rsvp') && invitation.rsvpEnabled && (slug || sample) && remaining !== undefined && remaining > 0 && <section className="invite-section" id="invitation-rsvp"><h2>{t.rsvp}</h2>
+      {sample && <p>Try the sample RSVP. Responses are discarded.</p>}{answer ? <p role="status" className="success">{answer}</p> : <form className="stack" onSubmit={respond}>
+        <label>{t.name}<input name="name" required maxLength={180} /></label><label>{t.email}<input name="email" required type="email" maxLength={190} /></label>
+        <label>{t.rsvp}<select name="attending"><option value="yes">{t.yes}</option><option value="no">{t.no}</option></select></label>
+        <label>{t.party}<input name="party" type="number" min={1} max={12} defaultValue={1} required /></label>
+        <button className="button" disabled={busy}>{t.submit}</button>{error && <p role="alert" className="error">{error}</p>}
+      </form>}
+    </section>)
+  if (config?.componentKey) {
+    const Template = resolveTemplate(config.componentKey)
+    if (!Template) {
+      console.error('Unknown InviteIdeas invitation component', config.componentKey)
+      return <section className="wrap content"><h1>Invitation unavailable</h1><p>Please contact the invitation host or try again later.</p><Link href="/">InviteIdeas home</Link></section>
+    }
+    return <div className="batch-render" lang={invitation.language}><Template data={toTemplateData(invitation, rsvp)} /></div>
+  }
   return <>
     {sealed && <EnvelopeOpening names={invitation.names} language={invitation.language} artwork={config!.image} onOpen={() => setOpened(true)} />}
     <article hidden={sealed} className={'invitation ' + (config?.theme || '') + (config?.layout ? ' wedding-edition wedding-' + config.layout : '')} lang={invitation.language}>
@@ -82,14 +100,7 @@ export function InvitationView({ invitation, slug, sample = false }: { invitatio
     {sections.includes('story') && invitation.story && <section className="invite-section wedding-note"><h2>{t.story}</h2><p>{invitation.story}</p></section>}
     {sections.includes('family') && invitation.family && <section className="invite-section wedding-note wedding-family"><h2>{t.family}</h2><p>{invitation.family}</p></section>}
     {sections.includes('music') && invitation.music && <section className="invite-section"><p>{invitation.music.name}</p><audio controls preload="none" src={invitation.music.file} /></section>}
-    {sections.includes('rsvp') && invitation.rsvpEnabled && (slug || sample) && remaining !== undefined && remaining > 0 && <section className="invite-section" id="invitation-rsvp"><h2>{t.rsvp}</h2>
-      {sample && <p>Try the sample RSVP. Responses are discarded.</p>}{answer ? <p role="status" className="success">{answer}</p> : <form className="stack" onSubmit={respond}>
-        <label>{t.name}<input name="name" required maxLength={180} /></label><label>{t.email}<input name="email" required type="email" maxLength={190} /></label>
-        <label>{t.rsvp}<select name="attending"><option value="yes">{t.yes}</option><option value="no">{t.no}</option></select></label>
-        <label>{t.party}<input name="party" type="number" min={1} max={12} defaultValue={1} required /></label>
-        <button className="button" disabled={busy}>{t.submit}</button>{error && <p role="alert" className="error">{error}</p>}
-      </form>}
-    </section>}
+    {rsvp}
     <footer className="invite-section"><Link href="/" aria-label="InviteIdeas"><img src="/images/brand.png" alt="InviteIdeas" width="150" style={{ margin: 'auto' }} /></Link></footer>
     </article>
   </>
@@ -124,7 +135,7 @@ export function PrivatePreview({ token }: { token: string }) {
     <div className="preview-banner"><strong>Private invitation preview</strong><Link className="button outline small" href="/dashboard">My Invitations</Link>
       {published && <Link className="button small" href={'/invite/' + published}>Open Your Invitation</Link>}
       {!published && invitation && !invitation.order && <label>Coupon code<input value={coupon} onChange={e => setCoupon(e.target.value)} maxLength={32} placeholder="Optional" /></label>}
-      {!published && invitation && (!invitation.order || (invitation.order.status === 'PENDING' && invitation.order.method === 'ONLINE')) && <button className="button small" onClick={checkout} disabled={busy}>{busy ? 'Processing…' : 'Pay & publish' + (coupon.trim() && !invitation.order ? '' : ' · ' + money(invitation.order?.amount ?? invitation.checkoutPrice ?? 0))}</button>}
+      {!published && invitation && invitation.events.length > 0 && (!invitation.order || (invitation.order.status === 'PENDING' && invitation.order.method === 'ONLINE')) && <button className="button small" onClick={checkout} disabled={busy}>{busy ? 'Processing…' : 'Pay & publish' + (coupon.trim() && !invitation.order ? '' : ' · ' + money(invitation.order?.amount ?? invitation.checkoutPrice ?? 0))}</button>}
       {invitation?.order?.status === 'PENDING' && invitation.order.paymentLinkUrl && <a className="button small" href={invitation.order.paymentLinkUrl}>Pay with Razorpay</a>}
     </div>
     {error && <p className="wrap error" role="alert">{error}</p>}

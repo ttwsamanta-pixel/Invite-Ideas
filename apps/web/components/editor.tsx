@@ -1,10 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useEffect, useRef, useState } from 'react'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { InvitationView } from './invitation'
 import { api, HttpError } from '../lib/client'
 import type { Invitation, Template } from '../lib/data'
 
@@ -27,11 +28,15 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
   const [ready, setReady] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [livePreview, setLivePreview] = useState(false)
+  const draftRequest = useRef<string>(undefined)
   const [template, setTemplate] = useState(selected || templates[0]?.slug || '')
   const { register, reset, control, handleSubmit, formState, getValues, setValue } = useForm<Fields>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', names: '', language: 'en', story: '', family: '', details: {}, rsvpEnabled: true, musicId: '', events: [emptyEvent] },
   })
+  const draftId = id || existing?.id
+  const formValues = useWatch({ control })
   const { fields, append, remove, replace } = useFieldArray({ control, name: 'events' })
   useEffect(() => {
     let live = true
@@ -41,7 +46,7 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
       if (id) {
         const invitation = result as Invitation
         setExisting(invitation)
-        reset({ ...invitation, details: invitation.details || {}, musicId: invitation.musicId || '', events: invitation.events.map(item => ({ ...item, mapUrl: item.mapUrl || '', date: indiaLocal(item.startsAt) })) })
+        reset({ ...invitation, language: invitation.events.length ? invitation.language : invitation.templateVersion?.config.language || invitation.language, details: invitation.details || {}, musicId: invitation.musicId || '', events: invitation.events.length ? invitation.events.map(item => ({ ...item, mapUrl: item.mapUrl || '', date: indiaLocal(item.startsAt) })) : (invitation.templateVersion?.config.events || ['']).map(name => ({ ...emptyEvent, name })) })
       }
       setReady(true)
     }).catch(failure => {
@@ -59,12 +64,27 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
     if (!hasEventDetails) replace(config.events.map(name => ({ ...emptyEvent, name })))
     if (config.language && !formState.dirtyFields.language) setValue('language', config.language)
   }, [config, id, getValues, replace, setValue, formState.dirtyFields.language])
+  useEffect(() => {
+    if (!ready || draftId || owner || !config?.componentKey) return
+    let active = true
+    draftRequest.current ||= crypto.randomUUID()
+    api<Invitation>('/invitations/drafts', 'POST', { template, requestId: draftRequest.current })
+      .then(draft => {
+        if (!active) return
+        setExisting(draft)
+        const url = new URL(location.href)
+        url.searchParams.set('edit', draft.id)
+        history.replaceState(null, '', url)
+      })
+      .catch(failure => { if (active) setError(failure.message) })
+    return () => { active = false }
+  }, [config?.componentKey, draftId, owner, ready, template])
   const locked = existing && !['DRAFT', 'ACTIVE'].includes(existing.status || '')
   const save = handleSubmit(async data => {
     setError('')
     try {
-      const path = id ? '/invitations/' + id : owner ? '/admin/invitations' : '/invitations'
-      const saved = await api<Invitation>(path, id ? 'PATCH' : 'POST', {
+      const path = draftId ? '/invitations/' + draftId : owner ? '/admin/invitations' : '/invitations'
+      const saved = await api<Invitation>(path, draftId ? 'PATCH' : 'POST', {
         ...data, details: Object.fromEntries((config?.fields || []).map(field => [field.key, data.details[field.key] || ''])), template, ownerId: owner, timezone: 'Asia/Kolkata', musicId: data.musicId || null,
         events: data.events.map(({ date, mapUrl, ...event }) => ({ ...event, mapUrl: mapUrl || undefined, startsAt: date + ':00+05:30' })),
       })
@@ -72,7 +92,7 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
     } catch (failure) { setError((failure as Error).message) }
   })
   async function upload(file: File) {
-    if (!id) return
+    if (!draftId) return
     setUploading(true); setError('')
     try {
       if (file.size > 5_000_000 || !/\.(jpe?g|png|webp)$/i.test(file.name)) throw new Error('Choose a JPEG, PNG or WebP photo up to 5 MB.')
@@ -82,17 +102,22 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
         reader.onerror = reject
         reader.readAsDataURL(file)
       })
-      const asset = await api<{ id: string }>('/invitations/' + id + '/gallery', 'POST', { type: file.type, data })
+      const asset = await api<{ id: string }>('/invitations/' + draftId + '/gallery', 'POST', { type: file.type, data })
       setExisting(previous => previous ? { ...previous, gallery: [...previous.gallery, asset] } : previous)
     } catch (failure) { setError((failure as Error).message) } finally { setUploading(false) }
   }
+  const liveEvents = (formValues.events || []).flatMap(event => {
+    const start = Date.parse((event.date || '') + ':00+05:30')
+    if (!event.name || !Number.isFinite(start)) return []
+    return [{ name: event.name, startsAt: new Date(start).toISOString(), venue: event.venue || '', mapUrl: /^https:\/\//.test(event.mapUrl || '') ? event.mapUrl : undefined, description: event.description || '' }]
+  }).sort((a, b) => a.startsAt.localeCompare(b.startsAt))
   return <section className="wrap content"><h1>{id ? 'Edit your invitation' : 'Create your invitation'}</h1>
     {error && <p className="error" role="alert">{error}</p>}
     {!ready && !error && <p role="status">Loading invitation editor…</p>}
     {locked && <p className="panel">This invitation is {existing.status === 'LOCKED' ? 'locked because the final event has started.' : 'awaiting payment or archived.'} <Link href="/dashboard">Back to dashboard</Link></p>}
     {ready && !locked && <div className="split"><form className="stack" onSubmit={save}>
       <section className="panel stack"><h2>Basic details</h2>
-        {!id && <label>Template<select value={template} onChange={e => setTemplate(e.target.value)}>{templates.map(item => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>}
+        {!draftId && !config?.componentKey && <label>Template<select value={template} onChange={e => setTemplate(e.target.value)}>{templates.map(item => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>}
         <div className="field-grid"><label>Invitation title<input {...register('title')} required maxLength={180} /></label><label>Names<input {...register('names')} required maxLength={180} /></label></div>
         <label>Invitation language<select {...register('language')}><option value="en">English</option><option value="bn">বাংলা</option><option value="hi">हिन्दी</option></select></label>
       </section>
@@ -110,9 +135,18 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
       <label className="checkbox"><input type="checkbox" {...register('rsvpEnabled')} /> Enable guest RSVP</label></section>
       {Object.keys(formState.errors).length > 0 && <p role="alert" className="error">Check the required fields, event dates and HTTPS map links.</p>}
       <button className="button" disabled={formState.isSubmitting || uploading}>{formState.isSubmitting ? 'Saving…' : owner ? 'Save invitation' : 'Save & preview'}</button>
-    </form><aside className="panel stack"><h2>Photo gallery</h2>{id ? <>
+    </form><aside className="panel stack"><h2>Photo gallery</h2>{draftId ? <>
       <label>Add a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file); event.target.value = '' }} /></label>
       <div className="gallery">{existing?.gallery.map(asset => <a key={asset.id} href={'/api/public/media/' + asset.id}><img src={'/api/public/media/' + asset.id} alt="Invitation gallery photo" /></a>)}</div>
     </> : <p>Save your draft, then reopen the editor to add photos.</p>}</aside></div>}
+    {ready && config?.componentKey && <div className="panel stack">
+      <button type="button" className="button outline" aria-expanded={livePreview} onClick={() => setLivePreview(!livePreview)}>{livePreview ? 'Hide live preview' : 'Show live preview'}</button>
+      {livePreview && <InvitationView sample invitation={{
+        id: draftId || '', title: formValues.title || '', names: formValues.names || '', language: formValues.language || config.language || 'en', timezone: 'Asia/Kolkata',
+        story: formValues.story || '', family: formValues.family || '', details: formValues.details as Invitation['details'],
+        events: liveEvents, finalEventAt: liveEvents.at(-1)?.startsAt || new Date(0).toISOString(), rsvpEnabled: Boolean(formValues.rsvpEnabled), order: null, config,
+        gallery: existing?.gallery.map(image => ({ id: image.id, url: '/api/public/media/' + image.id })) || [],
+      }} />}
+    </div>}
   </section>
 }

@@ -79,3 +79,11 @@ With the web and API servers running against a disposable seeded database, set `
 ## Wedding collection
 
 The collection is defined in `wedding-collection.json`. Each design declares its saved template layout, sample ceremony schedule, guest-facing sections, and optional editor fields. Run `npm run db:deploy`, `npm run generate -w api`, and `npm run db:seed` to add the collection to an existing database. The seed adds missing entries and preserves administrator edits to existing templates.
+## Uploaded template batch 01
+
+The five React designs and scoped styles live in `apps/web/templates`. The versioned `config.componentKey` selects a lazy-loaded component through `apps/web/templates/index.ts`; `adapter.ts` translates existing invitation data to the uploaded components. `template-batch-01.json` seeds published records, converting the supplied INR prices to paise. No customer content is stored in template source.
+
+- `GET /api/templates` lists published designs. `PATCH /api/admin/templates/:slug` updates availability, display metadata and pricing. `POST /api/admin/templates/:slug/versions` publishes a versioned configuration.
+- `POST /api/invitations/drafts` starts an authenticated draft with a template and request ID. `GET /api/invitations/:id` and `PATCH /api/invitations/:id` load and save editor data. Checkout requires a complete schedule.
+- `GET /api/preview/:token` returns an authenticated preview. `GET /api/public/invite/:slug` returns a published invitation and its pinned template ID and version. `/invite/[slug]` uses the same renderer as the editor and previews.
+- The existing checkout, payment webhook, RSVP, gallery and QR endpoints are reused. Run migrations and seed before testing the new designs.

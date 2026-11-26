@@ -78,6 +78,10 @@ model Template {
   style String
   badge String?
   classification String
+  culture String?
+  subcategory String?
+  sortOrder Int @default(0)
+  archivedAt DateTime?
   categoryId String
   category Category @relation(fields: [categoryId], references: [slug])
   regularPrice Int
