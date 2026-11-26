@@ -1,0 +1,16 @@
+.batch-render .roka-page{background:#f5f0e8;color:#292522;font-family:Arial,sans-serif}
+.batch-render .roka-cover{min-height:100svh;display:grid;place-items:center;text-align:center;position:relative;background:radial-gradient(circle at center,#fffaf0 0,#e9dfd1 100%)}
+.batch-render .roka-cover-inner{width:min(800px,90vw);position:relative;z-index:2}
+.batch-render .roka-cover h1{font-family:Georgia,serif;font-size:clamp(58px,10vw,128px);font-weight:400;line-height:.85;margin:28px 0}
+.batch-render .roka-cover h1 span{font-style:italic;font-size:.45em;display:inline-block;margin:0 .12em}
+.batch-render .roka-cover p{letter-spacing:.25em;text-transform:uppercase;font-size:12px}
+.batch-render .roka-date{margin-top:30px;letter-spacing:.12em}
+.batch-render .roka-orbit{position:absolute;width:min(65vw,650px);height:min(65vw,650px);border:1px solid rgba(80,60,40,.3);border-radius:50%;animation:ii-batch3-spin 28s linear infinite}
+@keyframes ii-batch3-spin{to{transform:rotate(360deg)}}
+.batch-render .roka-intro{text-align:center}.batch-render .roka-intro .ii-copy{margin:auto}
+.batch-render .roka-count{background:#2e3029;color:#f7f0df;text-align:center}
+.batch-render .roka-events{background:#d8d0c3}
+.batch-render .roka-venue{background:#b6a27f;color:#fffaf0}
+.batch-render .roka-venue a{color:inherit}
+.batch-render .roka-end{min-height:65vh;display:grid;place-items:center;text-align:center;background:#262521;color:#f7f0df;padding:80px}
+.batch-render .roka-end h2{font:400 clamp(42px,8vw,90px)/.95 Georgia,serif}

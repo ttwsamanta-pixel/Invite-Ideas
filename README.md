@@ -91,3 +91,7 @@ The five React designs and scoped styles live in `apps/web/templates`. The versi
 ## Uploaded template batch 02
 
 `template-batch-02.json` adds Phulkari Courtyard, Jasmine & Zari, Alpona & Silk, Salt & Sunset, and Moonlit Jali to the same component registry. The ZIP did not include its CSS imports. The scoped styles under `apps/web/templates` provide the missing presentation. Running `npm run db:seed` adds the new IDs and publishes a new version for the three matching starter records without rewriting their original versions or catalog pricing. Existing invitations keep their pinned version. The historical `alpana-silk` and `salt-and-sunset` slugs remain separate catalog records.
+
+## Uploaded template batch 03
+
+`template-batch-03.json` seeds five occasion templates through the existing catalog and versioned invitation renderer. The uploaded components and scoped CSS are in `apps/web/templates`. Each design has sample copy in its catalog record for the sample preview; customer invitations use saved invitation data. The batch adds the Engagement / Roka category and records creation timestamps for new templates. Existing templates with unknown original creation dates retain a blank date in Admin.

@@ -13,6 +13,11 @@ export const INVITE_IDEAS_TEMPLATE_REGISTRY = {
   'alpona-silk': dynamic(() => import('./AlponaSilk')),
   'salt-sunset': dynamic(() => import('./SaltSunset')),
   'moonlit-jali': dynamic(() => import('./MoonlitJali')),
+  PromiseRoka: dynamic(() => import('./PromiseRoka')),
+  MidnightBirthday: dynamic(() => import('./MidnightBirthday')),
+  LittleWonder: dynamic(() => import('./LittleWonder')),
+  ShubhGriha: dynamic(() => import('./ShubhGriha')),
+  ForeverUs: dynamic(() => import('./ForeverUs')),
 } as const
 
 export function resolveTemplate(key: string) {

@@ -118,7 +118,7 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
     {ready && !locked && <div className="split"><form className="stack" onSubmit={save}>
       <section className="panel stack"><h2>Basic details</h2>
         {!draftId && !config?.componentKey && <label>Template<select value={template} onChange={e => setTemplate(e.target.value)}>{templates.map(item => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>}
-        <div className="field-grid"><label>Invitation title<input {...register('title')} required maxLength={180} /></label><label>Names<input {...register('names')} required maxLength={180} /></label></div>
+        <div className="field-grid"><label>Invitation title<input {...register('title')} required maxLength={180} /></label><label>{config?.editorLabels?.name || 'Names'}<input {...register('names')} required maxLength={180} /></label></div>
         <label>Invitation language<select {...register('language')}><option value="en">English</option><option value="bn">বাংলা</option><option value="hi">हिन्दी</option></select></label>
       </section>
       <section className="panel stack"><h2>Events</h2><p>Enter event times in India Standard Time (IST). Editing closes at the start of your final event.</p>
@@ -131,7 +131,7 @@ export function Editor({ templates, selected, id, owner }: { templates: Template
       {config?.fields?.length ? <section className="panel stack"><h2>Guest information</h2>
         {config.fields.map(field => <label key={field.key}>{field.label}<textarea {...register(`details.${field.key}`)} maxLength={500} /></label>)}
       </section> : null}
-      <section className="panel stack"><h2>Personal touches</h2><label>Story<textarea {...register('story')} maxLength={4000} /></label><label>Family or additional message<textarea {...register('family')} maxLength={4000} /></label><label>Background music<select {...register('musicId')}><option value="">No music</option>{trackList.map(track => <option value={track.id} key={track.id}>{track.name} · {track.artist}</option>)}</select></label>
+      <section className="panel stack"><h2>Personal touches</h2><label>{config?.editorLabels?.story || 'Story'}<textarea {...register('story')} maxLength={4000} /></label><label>{config?.editorLabels?.family || 'Family or additional message'}<textarea {...register('family')} maxLength={4000} /></label><label>Background music<select {...register('musicId')}><option value="">No music</option>{trackList.map(track => <option value={track.id} key={track.id}>{track.name} · {track.artist}</option>)}</select></label>
       <label className="checkbox"><input type="checkbox" {...register('rsvpEnabled')} /> Enable guest RSVP</label></section>
       {Object.keys(formState.errors).length > 0 && <p role="alert" className="error">Check the required fields, event dates and HTTPS map links.</p>}
       <button className="button" disabled={formState.isSubmitting || uploading}>{formState.isSubmitting ? 'Saving…' : owner ? 'Save invitation' : 'Save & preview'}</button>

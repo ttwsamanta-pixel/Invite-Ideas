@@ -1,0 +1,6 @@
+.batch-render .home-page{background:#f4ead8;color:#3a3024;font-family:Arial,sans-serif}
+.batch-render .home-hero{min-height:100svh;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at center,#fff7e8,#c7a66c 100%);position:relative}
+.batch-render .home-gate{width:min(850px,90vw);padding:80px 30px;border:1px solid rgba(58,48,36,.35);position:relative}
+.batch-render .home-gate:before,.batch-render .home-gate:after{content:"";position:absolute;top:0;bottom:0;width:15px;background:#3a3024}.batch-render .home-gate:before{left:0}.batch-render .home-gate:after{right:0}
+.batch-render .home-hero h1{font:400 clamp(52px,10vw,120px)/.9 Georgia,serif;margin:26px 0}.batch-render .home-hero p{letter-spacing:.18em;text-transform:uppercase;font-size:11px}.batch-render .home-arch{font-size:48px;margin-top:35px}
+.batch-render .home-welcome{text-align:center}.batch-render .home-welcome .ii-copy{margin:auto}.batch-render .home-count{background:#3f3328;color:#f6e9d2;text-align:center}.batch-render .home-gallery{background:#e5d3b5}.batch-render .home-venue{background:#d3b071}.batch-render .home-venue a{color:inherit}.batch-render .home-end{min-height:60vh;display:grid;place-items:center;text-align:center;background:#3f3328;color:#f6e9d2;padding:70px}.batch-render .home-end h2{font:400 clamp(45px,8vw,90px)/.9 Georgia,serif;margin-top:20px}

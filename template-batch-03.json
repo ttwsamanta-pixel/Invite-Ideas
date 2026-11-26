@@ -1,0 +1,218 @@
+[
+  {
+    "id": "the-promise-roka",
+    "name": "The Promise",
+    "category": "engagement-roka",
+    "componentKey": "PromiseRoka",
+    "tier": "Premium",
+    "style": "Romantic",
+    "offerPrice": 119900,
+    "regularPrice": 149900,
+    "config": {
+      "theme": "rose",
+      "image": "/images/the-promise-roka.webp",
+      "componentKey": "PromiseRoka",
+      "names": "Ishita & Rohan",
+      "language": "en",
+      "events": [
+        "Ring Ceremony",
+        "Dinner"
+      ],
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our story",
+        "family": "A note from our families"
+      },
+      "fields": [
+        {
+          "key": "ring-note",
+          "label": "Ring ceremony notes",
+          "example": "Please arrive before the rings are exchanged."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "midnight-birthday",
+    "name": "Midnight Birthday",
+    "category": "birthday",
+    "componentKey": "MidnightBirthday",
+    "tier": "Premium",
+    "style": "Night Celebration",
+    "offerPrice": 99900,
+    "regularPrice": 129900,
+    "config": {
+      "theme": "night",
+      "image": "/images/midnight-birthday.webp",
+      "componentKey": "MidnightBirthday",
+      "names": "Aarav",
+      "language": "en",
+      "events": [
+        "Birthday Party",
+        "Cake Cutting"
+      ],
+      "editorLabels": {
+        "name": "Birthday person",
+        "story": "Birthday message",
+        "family": "Message from the host"
+      },
+      "fields": [
+        {
+          "key": "age",
+          "label": "Age",
+          "example": "25"
+        },
+        {
+          "key": "dress-code",
+          "label": "Dress code",
+          "example": "Midnight blue or silver."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "little-wonder",
+    "name": "Little Wonder",
+    "category": "baby-shower",
+    "componentKey": "LittleWonder",
+    "tier": "Premium",
+    "style": "Soft Pastel",
+    "offerPrice": 99900,
+    "regularPrice": 129900,
+    "config": {
+      "theme": "rose",
+      "image": "/images/little-wonder.webp",
+      "componentKey": "LittleWonder",
+      "names": "Anika & Dev",
+      "language": "en",
+      "events": [
+        "Baby Shower",
+        "Lunch"
+      ],
+      "editorLabels": {
+        "name": "Parents-to-be",
+        "story": "Baby shower message",
+        "family": "Family message"
+      },
+      "fields": [
+        {
+          "key": "gift-note",
+          "label": "Gift or registry note",
+          "example": "Your blessings are the best gift."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "shubh-griha",
+    "name": "Shubh Griha",
+    "category": "housewarming",
+    "componentKey": "ShubhGriha",
+    "tier": "Premium",
+    "style": "Traditional",
+    "offerPrice": 109900,
+    "regularPrice": 139900,
+    "config": {
+      "theme": "marigold",
+      "image": "/images/shubh-griha.webp",
+      "componentKey": "ShubhGriha",
+      "names": "The Sharma family",
+      "language": "en",
+      "events": [
+        "Griha Pravesh",
+        "Puja",
+        "Lunch"
+      ],
+      "editorLabels": {
+        "name": "Family name",
+        "story": "Welcome message",
+        "family": "Family blessings"
+      },
+      "fields": [
+        {
+          "key": "home-note",
+          "label": "Home or entry instructions",
+          "example": "Please use the east gate."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  },
+  {
+    "id": "forever-us",
+    "name": "Forever Us",
+    "category": "anniversary",
+    "componentKey": "ForeverUs",
+    "tier": "Luxury",
+    "style": "Romantic",
+    "offerPrice": 149900,
+    "regularPrice": 179900,
+    "config": {
+      "theme": "ruby",
+      "image": "/images/forever-us.webp",
+      "componentKey": "ForeverUs",
+      "names": "Meera & Kabir",
+      "language": "en",
+      "events": [
+        "Anniversary Celebration",
+        "Dinner"
+      ],
+      "editorLabels": {
+        "name": "Couple names",
+        "story": "Our memories",
+        "family": "Anniversary message"
+      },
+      "fields": [
+        {
+          "key": "anniversary-year",
+          "label": "Years together",
+          "example": "25"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ]
+    }
+  }
+]

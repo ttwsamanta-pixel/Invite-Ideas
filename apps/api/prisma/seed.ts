@@ -4,6 +4,7 @@ import catalog from '../../../catalog.json'
 import weddingCollection from '../../../wedding-collection.json'
 import templateBatch from '../../../template-batch-01.json'
 import batchTwo from '../../../template-batch-02.json'
+import batchThree from '../../../template-batch-03.json'
 
 const db = new Db()
 async function seed() {
@@ -69,6 +70,17 @@ async function seed() {
         })
         if (!current.culture) await tx.template.update({ where: { slug: current.slug }, data: { culture: design.culture } })
       }
+    })
+  }
+  for (const design of batchThree) {
+    await db.template.upsert({
+      where: { slug: design.id }, update: {},
+      create: {
+        slug: design.id, name: design.name, categoryId: design.category, style: design.style, classification: design.tier,
+        image: design.config.image, description: design.name + ' invitation with an event schedule, photo gallery and RSVP.',
+        regularPrice: design.regularPrice, offerPrice: design.offerPrice,
+        versions: { create: { number: 1, config: design.config } },
+      },
     })
   }
   const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env

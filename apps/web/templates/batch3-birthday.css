@@ -1,0 +1,10 @@
+.batch-render .bday-page{background:#0d0b13;color:#f8f1e7;font-family:Arial,sans-serif}
+.batch-render .bday-hero{min-height:100svh;display:grid;place-items:center;text-align:center;position:relative;background:radial-gradient(circle at 50% 45%,#32224b 0,#120d1b 55%,#07060a 100%);overflow:hidden}
+.batch-render .bday-stars{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:57px 57px;opacity:.22;animation:ii-batch3-stars 12s linear infinite}
+@keyframes ii-batch3-stars{to{background-position:57px 114px}}
+.batch-render .bday-hero-content{position:relative;z-index:2}.batch-render .bday-hero h1{font:400 clamp(54px,11vw,140px)/.85 Georgia,serif;margin:25px 0}
+.batch-render .bday-number{font:700 clamp(80px,15vw,180px)/.8 Arial,sans-serif;letter-spacing:-.08em}.batch-render .bday-number span{font:400 12px Arial;letter-spacing:.3em;text-transform:uppercase;margin-left:14px}
+.batch-render .bday-hero p{letter-spacing:.2em;text-transform:uppercase;font-size:12px;margin-top:35px}
+.batch-render .bday-center{text-align:center}.batch-render .bday-center .ii-copy{margin:auto}.batch-render .bday-count{background:#c58a46;color:#160f0b;text-align:center}.batch-render .bday-gallery{background:#16121e}.batch-render .bday-venue{background:#e8d8c5;color:#17120f}.batch-render .bday-venue a{color:inherit}
+.batch-render .bday-end{min-height:65vh;display:grid;place-items:center;padding:70px;background:#c58a46;color:#160f0b}
+.batch-render .bday-end h2{font:400 clamp(45px,8vw,92px)/.9 Georgia,serif;margin-top:20px}

@@ -82,6 +82,7 @@ model Template {
   subcategory String?
   sortOrder Int @default(0)
   archivedAt DateTime?
+  createdAt DateTime? @default(now())
   categoryId String
   category Category @relation(fields: [categoryId], references: [slug])
   regularPrice Int

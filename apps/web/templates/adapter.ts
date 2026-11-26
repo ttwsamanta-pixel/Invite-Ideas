@@ -8,6 +8,7 @@ export function toTemplateData(invitation: Invitation, rsvp: ReactNode) {
   const timeFormat = new Intl.DateTimeFormat(invitation.language, { timeStyle: 'short', timeZone: invitation.timezone })
   return {
     title: invitation.title,
+    names: invitation.names,
     groomName: invitation.details?.['groom-name'] || first,
     brideName: invitation.details?.['bride-name'] || partners.join(' & '),
     date: firstEvent ? dateFormat.format(new Date(firstEvent.startsAt)) : '',

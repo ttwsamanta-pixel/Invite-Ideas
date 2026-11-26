@@ -87,6 +87,7 @@ export function Admin() {
       </section>}
       {section === 'Templates' && <section className="panel stack"><h2>Manage templates</h2>
         {templates.map(template => <details key={template.slug} id={'aw-item-' + template.slug}><summary>{template.name} · {money(template.offerPrice)}</summary>
+          <p>{template.slug} · {template.categoryId} · {template.archivedAt ? 'Archived' : template.active ? 'Published' : 'Unpublished'} · Version {template.versions[0]?.number ?? '—'}{template.createdAt && <> · Created {new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' }).format(new Date(template.createdAt))}</>}</p>
           <form className="inline" onSubmit={event => { const fields = form(event); void run(() => api('/admin/templates/' + template.slug, 'PATCH', {
             regularPrice: Math.round(Number(fields.get('regular')) * 100), offerPrice: Math.round(Number(fields.get('offer')) * 100), featured: fields.get('featured') === 'on', status: fields.get('status'),
             name: fields.get('name'), image: fields.get('image'), style: fields.get('style'), categoryId: fields.get('category'), classification: fields.get('tier'),
