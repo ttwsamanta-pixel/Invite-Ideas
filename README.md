@@ -87,3 +87,7 @@ The five React designs and scoped styles live in `apps/web/templates`. The versi
 - `POST /api/invitations/drafts` starts an authenticated draft with a template and request ID. `GET /api/invitations/:id` and `PATCH /api/invitations/:id` load and save editor data. Checkout requires a complete schedule.
 - `GET /api/preview/:token` returns an authenticated preview. `GET /api/public/invite/:slug` returns a published invitation and its pinned template ID and version. `/invite/[slug]` uses the same renderer as the editor and previews.
 - The existing checkout, payment webhook, RSVP, gallery and QR endpoints are reused. Run migrations and seed before testing the new designs.
+
+## Uploaded template batch 02
+
+`template-batch-02.json` adds Phulkari Courtyard, Jasmine & Zari, Alpona & Silk, Salt & Sunset, and Moonlit Jali to the same component registry. The ZIP did not include its CSS imports. The scoped styles under `apps/web/templates` provide the missing presentation. Running `npm run db:seed` adds the new IDs and publishes a new version for the three matching starter records without rewriting their original versions or catalog pricing. Existing invitations keep their pinned version. The historical `alpana-silk` and `salt-and-sunset` slugs remain separate catalog records.

@@ -1,0 +1,5 @@
+.batch-two.moonlit{--paper:#edf1f8;--ink:#213253;--accent:#303f69;--gold:#8a652d}.batch-render .moonlit-opening>div:last-child{border:1px solid #ead39b;border-radius:48% 48% 0 0 / 95px 95px 0 0}.batch-render .moonlit .timeline-item{border-bottom:1px solid #a18a62}.batch-render .moonlit .gallery img{filter:saturate(.88)}
+
+.batch-render .moonlit-opening .jali-arch { position:relative;display:grid;padding:clamp(25px,6vw,68px);min-width:0;background:#171f3bba; }
+.batch-render .moonlit-opening .moon { font-size:3.2rem;color:#ffdfaa; }
+.batch-render .moonlit-opening .stars { position:absolute;inset:16px;border:1px dotted #f5d6a78c;pointer-events:none; }

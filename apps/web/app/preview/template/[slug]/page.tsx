@@ -37,8 +37,8 @@ export default async function Demo({ params }: { params: Promise<{ slug: string 
     <div className="preview-banner"><Link className="button outline small" href={'/design/' + slug}>Back to design</Link><strong>Sample invitation</strong><Link className="button small" href={'/editor/' + slug}>Use Template</Link></div>
     <InvitationView sample invitation={{
       id: '', templateId: template.slug, templateVersionNumber: template.versions[0].number, title: template.name, names: config.names, language, timezone: 'Asia/Kolkata',
-      story: config.layout ? sampleStories[slug] || '' : '',
-      family: config.layout ? (language === 'bn' ? 'দুই পরিবারের পক্ষ থেকে আপনাদের সাদর আমন্ত্রণ।' : 'With love from both our families, we hope you can celebrate with us.') : '',
+      story: sampleStories[slug === 'alpona-silk' ? 'alpana-silk' : slug === 'salt-sunset' ? 'salt-and-sunset' : slug] || '',
+      family: (config.layout || config.componentKey) ? (language === 'bn' ? 'দুই পরিবারের পক্ষ থেকে আপনাদের সাদর আমন্ত্রণ।' : 'With love from both our families, we hope you can celebrate with us.') : '',
       details: Object.fromEntries(config.fields?.map(field => [field.key, field.example || '']) || []),
       rsvpEnabled: Boolean(config.layout || config.componentKey), finalEventAt: events.at(-1)!.startsAt, events,
       gallery: (config.layout || config.componentKey) && config.sections.includes('gallery') ? ['bands', 'jasmine', 'table'].map(id => ({ id, url: '/images/wedding/sample-' + id + '.webp' })) : [], order: null, config,

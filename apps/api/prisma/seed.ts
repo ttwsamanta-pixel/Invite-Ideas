@@ -3,6 +3,7 @@ import { hash } from 'argon2'
 import catalog from '../../../catalog.json'
 import weddingCollection from '../../../wedding-collection.json'
 import templateBatch from '../../../template-batch-01.json'
+import batchTwo from '../../../template-batch-02.json'
 
 const db = new Db()
 async function seed() {
@@ -43,6 +44,31 @@ async function seed() {
         active: design.status === 'PUBLISHED',
         versions: { create: { number: 1, config: design.config } },
       },
+    })
+  }
+  for (const design of batchTwo) {
+    await db.$transaction(async tx => {
+      await tx.$queryRaw`SELECT slug FROM templates WHERE slug = ${design.id} FOR UPDATE`
+      const current = await tx.template.findUnique({ where: { slug: design.id }, include: { versions: { orderBy: { number: 'desc' }, take: 1 } } })
+      if (!current) {
+        await tx.template.create({ data: {
+          slug: design.id, name: design.name, categoryId: design.category, style: design.style, culture: design.culture,
+          classification: design.tier, image: design.config.image, description: design.description, featured: design.featured,
+          regularPrice: design.regularPrice, offerPrice: design.offerPrice, versions: { create: { number: 1, config: design.config } },
+        } })
+        return
+      }
+      const latest = current.versions[0]
+      const config = latest?.config
+      // Upgrade only the original catalog versions. Existing invitations keep their pinned records.
+      if (design.legacy && latest?.number === 1 && config && typeof config === 'object' && !Array.isArray(config) &&
+        !config.componentKey && config.layout && config.image === design.config.image && config.theme === design.config.theme) {
+        await tx.templateVersion.upsert({
+          where: { templateId_number: { templateId: current.slug, number: 2 } }, update: {},
+          create: { templateId: current.slug, number: 2, config: design.config },
+        })
+        if (!current.culture) await tx.template.update({ where: { slug: current.slug }, data: { culture: design.culture } })
+      }
     })
   }
   const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env

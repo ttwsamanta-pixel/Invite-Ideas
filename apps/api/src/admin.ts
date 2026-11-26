@@ -5,7 +5,7 @@ import { Db, email, note, short, slug, secureUrl, validate, weddingField, weddin
 import { Invitations } from './invitations'
 
 const imagePath = z.string().regex(/^\/images\/(?:wedding\/)?[a-z0-9-]+\.webp$/)
-const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), componentKey: z.string().regex(/^[A-Za-z][A-Za-z0-9]{0,79}$/).optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
+const configSchema = z.object({ theme: weddingTheme, layout: weddingLayout.optional(), componentKey: z.string().regex(/^[A-Za-z][A-Za-z0-9-]{0,79}$/).optional(), opening: z.literal('envelope').optional(), fields: z.array(weddingField).max(10).refine(items => new Set(items.map(item => item.key)).size === items.length).optional(), language: z.enum(['en', 'bn', 'hi']).optional(), place: short.optional(), events: z.array(short).min(1).max(20).optional(), names: short, image: imagePath, sections: z.array(z.enum(['events', 'countdown', 'gallery', 'story', 'family', 'rsvp', 'music'])).max(7) })
 const metadata = z.object({
   name: short, description: note, image: imagePath, style: short, categoryId: slug,
   classification: z.enum(['Basic', 'Standard', 'Premium', 'Luxury']),

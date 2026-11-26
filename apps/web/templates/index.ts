@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import './batch-base.css'
+import './batch-two.css'
 
 export const INVITE_IDEAS_TEMPLATE_REGISTRY = {
   RoyalIndianWedding: dynamic(() => import('./RoyalIndianWedding')),
@@ -7,6 +8,11 @@ export const INVITE_IDEAS_TEMPLATE_REGISTRY = {
   SikhRoyalWedding: dynamic(() => import('./SikhRoyalWedding')),
   MuslimNikahLuxury: dynamic(() => import('./MuslimNikahLuxury')),
   ModernEditorialWedding: dynamic(() => import('./ModernEditorialWedding')),
+  'phulkari-courtyard': dynamic(() => import('./PhulkariCourtyard')),
+  'jasmine-zari': dynamic(() => import('./JasmineZari')),
+  'alpona-silk': dynamic(() => import('./AlponaSilk')),
+  'salt-sunset': dynamic(() => import('./SaltSunset')),
+  'moonlit-jali': dynamic(() => import('./MoonlitJali')),
 } as const
 
 export function resolveTemplate(key: string) {

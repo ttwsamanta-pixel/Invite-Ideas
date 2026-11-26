@@ -1,0 +1,283 @@
+[
+  {
+    "id": "phulkari-courtyard",
+    "name": "Phulkari Courtyard",
+    "culture": "Sikh / Punjabi",
+    "category": "sikh-wedding",
+    "style": "Heritage",
+    "tier": "Premium",
+    "offerPrice": 189900,
+    "regularPrice": 219900,
+    "description": "A sunlit Punjabi invitation framed by embroidered phulkari.",
+    "featured": true,
+    "legacy": true,
+    "config": {
+      "theme": "teal",
+      "names": "Meher & Arjan",
+      "image": "/images/wedding/phulkari-courtyard.webp",
+      "language": "en",
+      "place": "Chandigarh",
+      "events": [
+        "Mehndi",
+        "Milni",
+        "Anand Karaj",
+        "Reception"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        },
+        {
+          "key": "gurdwara",
+          "label": "Gurdwara and entry guidance",
+          "example": "Please cover your head and remove your shoes before entering."
+        },
+        {
+          "key": "langar",
+          "label": "Langar details",
+          "example": "Langar will be served in the community hall after the ceremony."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ],
+      "componentKey": "phulkari-courtyard"
+    }
+  },
+  {
+    "id": "jasmine-zari",
+    "name": "Jasmine & Zari",
+    "culture": "South Indian",
+    "category": "south-indian-wedding",
+    "style": "Traditional",
+    "tier": "Premium",
+    "offerPrice": 179900,
+    "regularPrice": 209900,
+    "description": "Temple silk, jasmine and emerald accents for a South Indian wedding.",
+    "featured": false,
+    "legacy": true,
+    "config": {
+      "theme": "green",
+      "names": "Anjali & Karthik",
+      "image": "/images/wedding/jasmine-zari.webp",
+      "language": "en",
+      "place": "Chennai",
+      "events": [
+        "Nichayathartham",
+        "Muhurtham",
+        "Wedding lunch"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        },
+        {
+          "key": "muhurtham",
+          "label": "Muhurtham window",
+          "example": "The auspicious ceremony window is 8:15–9:00 am."
+        },
+        {
+          "key": "meal",
+          "label": "Wedding meal details",
+          "example": "Join us for a traditional banana-leaf lunch."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ],
+      "componentKey": "jasmine-zari"
+    }
+  },
+  {
+    "id": "alpona-silk",
+    "name": "Alpona & Silk",
+    "culture": "Bengali",
+    "category": "bengali-wedding",
+    "style": "Heritage",
+    "tier": "Premium",
+    "offerPrice": 169900,
+    "regularPrice": 199900,
+    "description": "Contemporary Bengali stationery with alpana ornaments and embroidered silk.",
+    "featured": false,
+    "legacy": false,
+    "config": {
+      "theme": "scarlet",
+      "names": "ঈশা ও সৌরভ",
+      "image": "/images/wedding/alpana-silk.webp",
+      "language": "bn",
+      "place": "Kolkata",
+      "events": [
+        "গায়ে হলুদ",
+        "শুভ বিবাহ",
+        "বৌভাত"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        },
+        {
+          "key": "ritual",
+          "label": "বিবাহের অনুষ্ঠান",
+          "example": "শুভদৃষ্টি ও মালাবদলের সময় মণ্ডপের কাছে উপস্থিত থাকুন।"
+        },
+        {
+          "key": "meal",
+          "label": "ভোজের বিবরণ",
+          "example": "বিবাহের পরে নৈশভোজের আয়োজন রয়েছে।"
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ],
+      "componentKey": "alpona-silk"
+    }
+  },
+  {
+    "id": "salt-sunset",
+    "name": "Salt & Sunset",
+    "culture": "Destination",
+    "category": "destination-wedding",
+    "style": "Modern",
+    "tier": "Premium",
+    "offerPrice": 199900,
+    "regularPrice": 229900,
+    "description": "A breezy editorial invitation for seaside vows and a weekend away.",
+    "featured": false,
+    "legacy": false,
+    "config": {
+      "theme": "coastal",
+      "names": "Tara & Nikhil",
+      "image": "/images/wedding/salt-and-sunset.webp",
+      "language": "en",
+      "place": "Goa",
+      "events": [
+        "Welcome dinner",
+        "Beach ceremony",
+        "Farewell brunch"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        },
+        {
+          "key": "stay",
+          "label": "Where to stay",
+          "example": "Guest rooms are available near the beach venue."
+        },
+        {
+          "key": "travel",
+          "label": "Transfers and travel",
+          "example": "A shuttle departs from the main hotel lobby."
+        },
+        {
+          "key": "attire",
+          "label": "Dress code",
+          "example": "Light linens and flat shoes are welcome."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ],
+      "componentKey": "salt-sunset"
+    }
+  },
+  {
+    "id": "moonlit-jali",
+    "name": "Moonlit Jali",
+    "culture": "Muslim / Nikah",
+    "category": "nikah-wedding",
+    "style": "Cinematic",
+    "tier": "Luxury",
+    "offerPrice": 249900,
+    "regularPrice": 279900,
+    "description": "Silver moonlight and carved latticework set the scene for a Nikah.",
+    "featured": true,
+    "legacy": true,
+    "config": {
+      "theme": "midnight",
+      "names": "Aaliya & Zayn",
+      "image": "/images/wedding/moonlit-jali.webp",
+      "language": "en",
+      "place": "Hyderabad",
+      "events": [
+        "Mehndi",
+        "Nikah",
+        "Walima"
+      ],
+      "fields": [
+        {
+          "key": "groom-name",
+          "label": "Groom name"
+        },
+        {
+          "key": "bride-name",
+          "label": "Bride name"
+        },
+        {
+          "key": "nikah",
+          "label": "Nikah ceremony guidance",
+          "example": "Please arrive before the ceremony begins."
+        },
+        {
+          "key": "walima",
+          "label": "Walima guest information",
+          "example": "Dinner follows in the garden pavilion."
+        }
+      ],
+      "sections": [
+        "events",
+        "countdown",
+        "gallery",
+        "story",
+        "family",
+        "rsvp",
+        "music"
+      ],
+      "componentKey": "moonlit-jali"
+    }
+  }
+]

@@ -26,6 +26,10 @@ export function toTemplateData(invitation: Invitation, rsvp: ReactNode) {
     })),
     gallery: invitation.gallery.flatMap(image => image.url ? [image.url] : []),
     artwork: invitation.config?.image,
+    guestDetails: (invitation.config?.fields || []).flatMap(field => {
+      const value = invitation.details?.[field.key]
+      return value && !['groom-name', 'bride-name'].includes(field.key) ? [{ key: field.key, label: field.label, value }] : []
+    }),
     musicUrl: invitation.music?.file,
     rsvpEnabled: Boolean(rsvp),
     rsvp,
